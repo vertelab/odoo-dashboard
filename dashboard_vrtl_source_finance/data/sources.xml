@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Revenue & Expenses sources -->
+    <record id="source_finance_dashboard" model="dashboard.source">
+        <field name="name">Revenue vs Expenses</field>
+        <field name="technical_name">finance.revenue_expenses</field>
+        <field name="model_name">dashboard.source.finance.dashboard</field>
+        <field name="category">Finance</field>
+        <field name="source_type">service</field>
+    </record>
+
+    <!-- AR Aging source -->
+    <record id="source_finance_ar_aging" model="dashboard.source">
+        <field name="name">AR Aging</field>
+        <field name="technical_name">finance.ar_aging</field>
+        <field name="model_name">dashboard.source.finance.ar_aging</field>
+        <field name="category">Finance</field>
+        <field name="source_type">service</field>
+    </record>
+
+    <!-- Customer LTV source (optimized) -->
+    <record id="source_finance_customer_ltv" model="dashboard.source">
+        <field name="name">Customer Lifetime Value</field>
+        <field name="technical_name">finance.customer_ltv</field>
+        <field name="model_name">dashboard.source.finance.customer_ltv</field>
+        <field name="category">Finance</field>
+        <field name="source_type">service</field>
+    </record>
+</odoo>

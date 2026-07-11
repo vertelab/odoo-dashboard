@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Chart Form View -->
+    <record id="dashboard_chart_form_view" model="ir.ui.view">
+        <field name="name">dashboard.chart.form</field>
+        <field name="model">dashboard.chart</field>
+        <field name="arch" type="xml">
+            <form string="Chart">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Chart Name"/></h1>
+                    </div>
+                    <group col="2">
+                        <group>
+                            <field name="key"/>
+                            <field name="dashboard_id" invisible="1"/>
+                            <field name="metric_id" required="1"/>
+                            <field name="chart_type"/>
+                            <field name="theme"/>
+                            <field name="background_color" widget="color"/>
+                        </group>
+                        <group>
+                            <field name="group_by_id" domain="[('model_id','=',metric_id.model_id)]"/>
+                            <field name="sub_group_by_id" domain="[('model_id','=',metric_id.model_id)]"/>
+                            <field name="time_range"/>
+                            <field name="sort_field_id" domain="[('model_id','=',metric_id.model_id)]"/>
+                            <field name="sort_order"/>
+                            <field name="limit_record"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Filter">
+                            <group>
+                                <div class="alert alert-info" invisible="chart_type != 'kanban'" style="margin-bottom:10px">
+                                    <strong>Kanban Configuration:</strong> Card layout, state colors, grouping, and actions are configured on the <em>Metric</em> (Kanban tab).
+                                </div>
+                                <field name="domain" widget="domain"/>
+                                <field name="date_filter_field_id" domain="[('model_id','=',metric_id.model_id)]"/>
+                                <field name="date_filter_option"/>
+                            </group>
+                        </page>
+                        <page string="Access">
+                            <group>
+                                <field name="chart_group_ids" widget="many2many_tags"/>
+                            </group>
+                        </page>
+                        <page string="Appearance">
+                            <group>
+                                <field name="show_unit"/>
+                                <field name="unit_type"/>
+                                <field name="custom_unit"/>
+                                <field name="icon"/>
+                                <field name="font_color" widget="color"/>
+                                <field name="font_size"/>
+                                <field name="font_weight"/>
+                            </group>
+                        </page>
+                        <page string="Drill-Down">
+                            <group>
+                                <field name="drill_enabled"/>
+                                <field name="drill_path" widget="json"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Chart List View -->
+    <record id="dashboard_chart_list_view" model="ir.ui.view">
+        <field name="name">dashboard.chart.list</field>
+        <field name="model">dashboard.chart</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="dashboard_id"/>
+                <field name="metric_id"/>
+                <field name="chart_type"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Chart Action -->
+    <record id="dashboard_chart_action" model="ir.actions.act_window">
+        <field name="name">Charts</field>
+        <field name="res_model">dashboard.chart</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

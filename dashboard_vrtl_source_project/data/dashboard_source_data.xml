@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="source_project_margin" model="dashboard.source">
+        <field name="name">Project Margin (P&amp;L)</field>
+        <field name="technical_name">project.margin</field>
+        <field name="model_name">dashboard.source.project.margin</field>
+        <field name="category">Project</field>
+        <field name="source_type">service</field>
+        <field name="is_active" eval="True"/>
+    </record>
+    <record id="source_project_wip" model="dashboard.source">
+        <field name="name">Project WIP</field>
+        <field name="technical_name">project.wip</field>
+        <field name="model_name">dashboard.source.project.wip</field>
+        <field name="category">Project</field>
+        <field name="source_type">service</field>
+        <field name="is_active" eval="True"/>
+    </record>
+    <record id="source_project_budget" model="dashboard.source">
+        <field name="name">Project Budget vs Actual</field>
+        <field name="technical_name">project.budget</field>
+        <field name="model_name">dashboard.source.project.budget</field>
+        <field name="category">Project</field>
+        <field name="source_type">service</field>
+        <field name="is_active" eval="True"/>
+    </record>
+</odoo>

@@ -1,0 +1,174 @@
+dashboard:
+  key: cfo_monthly
+  name: CFO Monthly
+  name_sv: CFO Månadsöversikt
+  icon: fa-chart-bar
+  category: Finance
+  auto_refresh: 3600000
+  cache_ttl: 3600
+
+filters:
+  - key: period
+    type: date_range
+    label: Period
+    default:
+      from: this_year_start
+      to: this_month_end
+
+metrics:
+  - key: finance.net_income
+    label: Net Income
+    source_type: composite
+    composite_formula: "{finance.revenue} - {finance.expenses}"
+    composite_metric_ids: [finance.revenue, finance.expenses]
+    unit: monetary
+
+  - key: finance.revenue
+    label: Revenue
+    source_type: model
+    model: account.move.line
+    field: credit
+    aggregation: sum
+    unit: monetary
+    date_field: date
+    domain:
+      - [parent_state, "=", posted]
+      - [account_id.account_type, in, [income, income_other]]
+
+  - key: finance.expenses
+    label: Expenses
+    source_type: model
+    model: account.move.line
+    field: debit
+    aggregation: sum
+    unit: monetary
+    date_field: date
+    domain:
+      - [parent_state, "=", posted]
+      - [account_id.account_type, in, [expense, expense_depreciation, expense_direct_cost]]
+
+  - key: finance.gross_margin
+    label: Gross Margin %
+    source_type: composite
+    composite_formula: "({finance.revenue} - {finance.expenses}) / {finance.revenue} * 100"
+    composite_metric_ids: [finance.revenue, finance.expenses]
+    unit: percentage
+
+  - key: finance.opex
+    label: OpEx
+    source_type: model
+    model: account.move.line
+    field: debit
+    aggregation: sum
+    unit: monetary
+    date_field: date
+    domain:
+      - [parent_state, "=", posted]
+      - [account_id.account_type, "=", expense]
+
+  - key: finance.ar_aging
+    label: AR Aging
+    source_type: model
+    model: account.move.line
+    field: balance
+    aggregation: sum
+    unit: monetary
+    domain:
+      - [parent_state, "=", posted]
+      - [account_id.account_type, "=", asset_receivable]
+      - [reconciled, "=", false]
+
+  - key: finance.ap_aging
+    label: AP Aging
+    source_type: model
+    model: account.move.line
+    field: balance
+    aggregation: sum
+    unit: monetary
+    domain:
+      - [parent_state, "=", posted]
+      - [account_id.account_type, "=", liability_payable]
+      - [reconciled, "=", false]
+
+  - key: finance.tax_liability
+    label: Tax Liability
+    source_type: model
+    model: account.move.line
+    field: balance
+    aggregation: sum
+    unit: monetary
+    domain:
+      - [parent_state, "=", posted]
+      - [account_id.account_type, in, [liability_vat, liability_tax]]
+
+charts:
+  - key: kpi_net_income
+    type: kpi
+    metric: finance.net_income
+    label: Net Income
+    comparison: previous_period
+    layout: {x: 0, y: 0, w: 3, h: 2}
+
+  - key: kpi_gross_margin
+    type: kpi
+    metric: finance.gross_margin
+    label: Gross Margin %
+    layout: {x: 3, y: 0, w: 3, h: 2}
+
+  - key: kpi_opex
+    type: kpi
+    metric: finance.opex
+    label: OpEx
+    layout: {x: 6, y: 0, w: 3, h: 2}
+
+  - key: kpi_tax
+    type: kpi
+    metric: finance.tax_liability
+    label: Tax Liability
+    layout: {x: 9, y: 0, w: 3, h: 2}
+
+  - key: chart_pl
+    type: stackedcolumn_chart
+    metric: finance.revenue
+    label: P&L by Month
+    layout: {x: 0, y: 2, w: 6, h: 4}
+    config:
+      group_by: date:month
+
+  - key: chart_ar_aging
+    type: bar_chart
+    metric: finance.ar_aging
+    label: AR Aging
+    layout: {x: 6, y: 2, w: 6, h: 4}
+
+layout:
+  - chartId: kpi_net_income
+    x: 0
+    y: 0
+    w: 3
+    h: 2
+  - chartId: kpi_gross_margin
+    x: 3
+    y: 0
+    w: 3
+    h: 2
+  - chartId: kpi_opex
+    x: 6
+    y: 0
+    w: 3
+    h: 2
+  - chartId: kpi_tax
+    x: 9
+    y: 0
+    w: 3
+    h: 2
+  - chartId: chart_pl
+    x: 0
+    y: 2
+    w: 6
+    h: 4
+  - chartId: chart_ar_aging
+    x: 6
+    y: 2
+    w: 6
+    h: 4

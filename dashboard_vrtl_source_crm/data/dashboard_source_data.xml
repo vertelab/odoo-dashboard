@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="source_crm_forecast" model="dashboard.source">
+        <field name="name">CRM Weighted Forecast</field>
+        <field name="technical_name">crm.forecast</field>
+        <field name="model_name">dashboard.source.crm.forecast</field>
+        <field name="category">CRM</field>
+        <field name="source_type">service</field>
+        <field name="is_active" eval="True"/>
+    </record>
+</odoo>

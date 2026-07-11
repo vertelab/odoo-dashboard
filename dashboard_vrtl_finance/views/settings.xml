@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="dashboard_settings_view" model="ir.ui.view">
+        <field name="name">dashboard.finance.settings</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="account.res_config_settings_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//div[hasclass('settings')]" position="inside">
+                <div class="app_settings_block" string="Dashboard Personas">
+                    <h2>Dashboard Personas</h2>
+                    <div class="row mt16">
+                        <div class="col-6">
+                            <field name="dashboard_ceo_active"/>
+                            <label for="dashboard_ceo_active" string="CEO Overview"/>
+                        </div>
+                        <div class="col-6">
+                            <field name="dashboard_cfo_daily_active"/>
+                            <label for="dashboard_cfo_daily_active" string="CFO Daily"/>
+                        </div>
+                    </div>
+                    <div class="row mt16">
+                        <div class="col-6">
+                            <field name="dashboard_cfo_monthly_active"/>
+                            <label for="dashboard_cfo_monthly_active" string="CFO Monthly"/>
+                        </div>
+                        <div class="col-6">
+                            <field name="dashboard_dept_active"/>
+                            <label for="dashboard_dept_active" string="Department Spend"/>
+                        </div>
+                    </div>
+                    <div class="row mt16">
+                        <div class="col-6">
+                            <field name="dashboard_bookkeeper_active"/>
+                            <label for="dashboard_bookkeeper_active" string="Bookkeeper Workspace"/>
+                        </div>
+                        <div class="col-6">
+                            <field name="dashboard_project_active"/>
+                            <label for="dashboard_project_active" string="Project Manager"/>
+                        </div>
+                    </div>
+                    <div class="row mt16">
+                        <div class="col-6">
+                            <field name="dashboard_sales_active"/>
+                            <label for="dashboard_sales_active" string="Sales Manager"/>
+                        </div>
+                    </div>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

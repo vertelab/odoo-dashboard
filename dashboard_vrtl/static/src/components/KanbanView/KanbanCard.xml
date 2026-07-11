@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="dashboard_vrtl.KanbanCard">
+        <div class="o_kanban_card" t-att-style="'border-left: 4px solid ' + this.stateColor"
+             t-on-click="() => this.handleClick()"
+             t-ref="card"
+             t-att-draggable="isDraggable ? 'true' : 'false'"
+             t-on-dragstart="(ev) => this.handleDragStart(ev)"
+             t-on-dragend="(ev) => this.handleDragEnd(ev)">
+            <!-- State ribbon -->
+            <div class="o_kanban_card_state" t-att-style="'background-color: ' + this.stateColor" t-if="stateValue">
+                <i t-att-class="'fa ' + stateIcon" t-if="stateIcon"/>
+                <span t-esc="stateLabel"/>
+            </div>
+
+            <!-- Card body -->
+            <div class="o_kanban_card_body">
+                <!-- Title -->
+                <div class="o_kanban_card_title" t-esc="title"/>
+
+                <!-- Subtitle -->
+                <div class="o_kanban_card_subtitle" t-if="subtitle" t-esc="subtitle"/>
+
+                <!-- Body KPI badges -->
+                <div class="o_kanban_card_kpis" t-if="bodyFields.length">
+                    <t t-foreach="bodyFields" t-as="field" t-key="field.name">
+                        <div class="o_kanban_kpi">
+                            <span class="o_kanban_kpi_label" t-esc="field.name"/>
+                            <span class="o_kanban_kpi_value" t-esc="formatValue(field.value, field.unit)"/>
+                        </div>
+                    </t>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="o_kanban_card_footer" t-if="footerFields.length">
+                <t t-foreach="footerFields" t-as="field" t-key="field.name">
+                    <span class="o_kanban_footer_item">
+                        <span class="o_kanban_footer_label" t-esc="field.name + ': '"/>
+                        <span class="o_kanban_footer_value" t-esc="field.value"/>
+                    </span>
+                </t>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="o_kanban_card_actions" t-if="visibleActions.length or hasMoreActions">
+                <button t-foreach="visibleActions" t-as="act" t-key="act.name"
+                        class="btn btn-sm btn-light o_kanban_action_btn"
+                        t-on-click="(ev) => this.handleActionClick(ev, act)">
+                    <i t-att-class="'fa ' + (act.icon or 'fa-arrow-right')" t-if="act.icon"/>
+                    <span t-esc="act.label or act.name"/>
+                </button>
+                <div t-if="hasMoreActions" class="dropdown d-inline">
+                    <button class="btn btn-sm btn-light dropdown-toggle" data-bs-toggle="dropdown">
+                        More
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li t-foreach="moreActions" t-as="act" t-key="act.name">
+                            <a class="dropdown-item" href="#"
+                               t-on-click="(ev) => this.handleActionClick(ev, act)">
+                                <i t-att-class="'fa ' + (act.icon or 'fa-arrow-right')" t-if="act.icon"/>
+                                <span t-esc="act.label or act.name"/>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Parent Menu -->
+    <menuitem id="parent_dashboard_menu"
+              name="BI Dashboard"
+              sequence="80"
+              web_icon="dashboard_vrtl,static/description/icon.png"/>
+
+    <!-- Dashboard sub-menus -->
+    <menuitem id="menu_dashboards"
+              name="Dashboards"
+              parent="parent_dashboard_menu"
+              action="dashboard_action"
+              sequence="10"/>
+
+    <menuitem id="menu_metrics"
+              name="Metrics"
+              parent="parent_dashboard_menu"
+              action="dashboard_metric_action"
+              sequence="20"/>
+
+    <menuitem id="menu_charts"
+              name="Charts"
+              parent="parent_dashboard_menu"
+              action="dashboard_chart_action"
+              sequence="30"/>
+
+    <menuitem id="menu_alerts"
+              name="Alert Rules"
+              parent="parent_dashboard_menu"
+              action="dashboard_alert_action"
+              sequence="40"/>
+</odoo>

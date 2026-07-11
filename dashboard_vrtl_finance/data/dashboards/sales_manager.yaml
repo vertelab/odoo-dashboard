@@ -1,0 +1,178 @@
+dashboard:
+  key: sales_manager
+  name: Sales Manager
+  name_sv: Säljchef
+  icon: fa-chart-pie
+  category: Finance
+  auto_refresh: 900000
+  cache_ttl: 600
+
+filters:
+  - key: period
+    type: date_range
+    label: Period
+    default:
+      from: this_quarter_start
+      to: today
+  - key: team
+    type: many2one
+    label: Sales Team
+    model: crm.team
+
+metrics:
+  - key: crm.pipeline_value
+    label: Pipeline Value
+    source_type: model
+    model: crm.lead
+    field: expected_revenue
+    aggregation: sum
+    unit: monetary
+    domain:
+      - [active, "=", true]
+      - [probability, ">", 0]
+      - [probability, "<", 100]
+
+  - key: crm.weighted_forecast
+    label: Weighted Forecast
+    source_type: model
+    model: crm.lead
+    field: expected_revenue
+    aggregation: sum
+    unit: monetary
+    domain:
+      - [active, "=", true]
+      - [probability, ">", 0]
+      - [probability, "<", 100]
+
+  - key: crm.won_revenue
+    label: Won Revenue
+    source_type: model
+    model: crm.lead
+    field: expected_revenue
+    aggregation: sum
+    unit: monetary
+    domain:
+      - [active, "=", true]
+      - [probability, "=", 100]
+
+  - key: crm.deal_count
+    label: Deal Count
+    source_type: model
+    model: crm.lead
+    field: id
+    aggregation: count
+    unit: integer
+    domain:
+      - [active, "=", true]
+
+  - key: crm.win_rate
+    label: Win Rate
+    source_type: composite
+    composite_formula: "{crm.won_revenue} / {crm.pipeline_value} * 100"
+    composite_metric_ids: [crm.won_revenue, crm.pipeline_value]
+    unit: percentage
+
+  - key: crm.avg_deal
+    label: Avg Deal Size
+    source_type: composite
+    composite_formula: "{crm.won_revenue} / {crm.deal_count}"
+    composite_metric_ids: [crm.won_revenue, crm.deal_count]
+    unit: monetary
+
+  - key: finance.revenue
+    label: Revenue
+    source_type: model
+    model: account.move.line
+    field: credit
+    aggregation: sum
+    unit: monetary
+    date_field: date
+    domain:
+      - [parent_state, "=", posted]
+      - [account_id.account_type, in, [income, income_other]]
+
+charts:
+  - key: kpi_pipeline
+    type: kpi
+    metric: crm.pipeline_value
+    label: Pipeline
+    layout: {x: 0, y: 0, w: 3, h: 2}
+
+  - key: kpi_forecast
+    type: kpi
+    metric: crm.weighted_forecast
+    label: Weighted Forecast
+    layout: {x: 3, y: 0, w: 3, h: 2}
+
+  - key: kpi_winrate
+    type: kpi
+    metric: crm.win_rate
+    label: Win Rate %
+    layout: {x: 6, y: 0, w: 3, h: 2}
+
+  - key: kpi_avg
+    type: kpi
+    metric: crm.avg_deal
+    label: Avg Deal
+    layout: {x: 9, y: 0, w: 3, h: 2}
+
+  - key: chart_funnel
+    type: funnel_chart
+    metric: crm.pipeline_value
+    label: Pipeline Funnel
+    layout: {x: 0, y: 2, w: 4, h: 4}
+    config:
+      group_by: stage_id
+
+  - key: chart_revenue_trend
+    type: line_chart
+    metric: finance.revenue
+    label: Revenue Trend
+    layout: {x: 4, y: 2, w: 4, h: 4}
+    config:
+      group_by: date:month
+
+  - key: chart_pipeline_trend
+    type: bar_chart
+    metric: crm.pipeline_value
+    label: Pipeline by Month
+    layout: {x: 8, y: 2, w: 4, h: 4}
+    config:
+      group_by: date_deadline:month
+
+layout:
+  - chartId: kpi_pipeline
+    x: 0
+    y: 0
+    w: 3
+    h: 2
+  - chartId: kpi_forecast
+    x: 3
+    y: 0
+    w: 3
+    h: 2
+  - chartId: kpi_winrate
+    x: 6
+    y: 0
+    w: 3
+    h: 2
+  - chartId: kpi_avg
+    x: 9
+    y: 0
+    w: 3
+    h: 2
+  - chartId: chart_funnel
+    x: 0
+    y: 2
+    w: 4
+    h: 4
+  - chartId: chart_revenue_trend
+    x: 4
+    y: 2
+    w: 4
+    h: 4
+  - chartId: chart_pipeline_trend
+    x: 8
+    y: 2
+    w: 4
+    h: 4

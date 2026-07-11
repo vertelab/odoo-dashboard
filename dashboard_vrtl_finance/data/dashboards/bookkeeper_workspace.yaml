@@ -1,0 +1,158 @@
+dashboard:
+  key: bookkeeper_workspace
+  name: Bookkeeper Workspace
+  name_sv: Bokförararbetsyta
+  icon: fa-book
+  category: Finance
+  auto_refresh: 300000
+  cache_ttl: 300
+
+filters:
+  - key: journal_type
+    type: selection
+    label: Journal Type
+    options: [bank, sale, purchase, cash, general]
+
+metrics:
+  - key: account.moves_kanban
+    label: Journal Moves
+    source_type: model
+    model: account.move
+    field: id
+    aggregation: count
+    unit: integer
+    date_field: date
+    domain:
+      - [state, in, [draft, posted]]
+    kanban:
+      state_field: state
+      state_colors:
+        draft: "#ffc107"
+        posted: "#28a745"
+        cancel: "#6c757d"
+      state_icons:
+        draft: fa-pencil
+        posted: fa-check-circle
+        cancel: fa-ban
+      card_title_field: name
+      card_subtitle_field: journal_id
+      card_body_fields:
+        - amount_total
+        - payment_state
+      card_footer_fields:
+        - invoice_date
+      card_actions:
+        - name: open_move
+          label: Open
+          icon: fa-external-link
+          action: ir.actions.act_window
+          params:
+            res_model: account.move
+            res_id: "{id}"
+            views:
+              - [false, form]
+        - name: post_move
+          label: Post
+          icon: fa-check
+          action: ir.actions.act_window
+          params:
+            res_model: account.move
+            res_id: "{id}"
+            views:
+              - [false, form]
+            context:
+              default_state: posted
+      group_field: journal_id
+      draggable: true
+      drag_group_field: journal_id
+
+  - key: finance.draft_count
+    label: Draft Moves
+    source_type: model
+    model: account.move
+    field: id
+    aggregation: count
+    unit: integer
+    domain:
+      - [state, "=", draft]
+
+  - key: finance.late_invoices
+    label: Late Invoices
+    source_type: model
+    model: account.move
+    field: id
+    aggregation: count
+    unit: integer
+    domain:
+      - [state, "=", posted]
+      - [payment_state, in, [not_paid, partial]]
+      - [invoice_date_due, "<", today_approx]
+
+  - key: finance.bank_balance
+    label: Bank Balance
+    source_type: model
+    model: account.move.line
+    field: balance
+    aggregation: sum
+    unit: monetary
+    domain:
+      - [parent_state, "=", posted]
+      - [account_id.account_type, in, [asset_cash, liability_credit_card]]
+
+charts:
+  - key: kanban_journals
+    type: kanban
+    metric: account.moves_kanban
+    label: Journal Moves
+    layout: {x: 0, y: 0, w: 12, h: 5}
+
+  - key: kpi_draft
+    type: kpi
+    metric: finance.draft_count
+    label: Draft Moves
+    layout: {x: 0, y: 5, w: 3, h: 2}
+
+  - key: kpi_late
+    type: kpi
+    metric: finance.late_invoices
+    label: Late Invoices
+    layout: {x: 3, y: 5, w: 3, h: 2}
+
+  - key: kpi_bank
+    type: kpi
+    metric: finance.bank_balance
+    label: Bank
+    layout: {x: 6, y: 5, w: 3, h: 2}
+
+  - key: table_late
+    type: table
+    metric: finance.late_invoices
+    label: Late Invoice Details
+    layout: {x: 9, y: 5, w: 3, h: 2}
+
+layout:
+  - chartId: kanban_journals
+    x: 0
+    y: 0
+    w: 12
+    h: 5
+  - chartId: kpi_draft
+    x: 0
+    y: 5
+    w: 3
+    h: 2
+  - chartId: kpi_late
+    x: 3
+    y: 5
+    w: 3
+    h: 2
+  - chartId: kpi_bank
+    x: 6
+    y: 5
+    w: 3
+    h: 2
+  - chartId: table_late
+    x: 9
+    y: 5
+    w: 3
+    h: 2

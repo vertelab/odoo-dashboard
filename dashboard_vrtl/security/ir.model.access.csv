@@ -1,0 +1,16 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_dashboard_dashboard_manager,dashboard.dashboard.manager,model_dashboard_dashboard,group_dashboard_manager,1,1,1,1
+access_dashboard_dashboard_user,dashboard.dashboard.user,model_dashboard_dashboard,group_dashboard_user,1,0,0,0
+access_dashboard_chart_manager,dashboard.chart.manager,model_dashboard_chart,group_dashboard_manager,1,1,1,1
+access_dashboard_chart_user,dashboard.chart.user,model_dashboard_chart,group_dashboard_user,1,0,0,0
+access_dashboard_metric_manager,dashboard.metric.manager,model_dashboard_metric,group_dashboard_manager,1,1,1,1
+access_dashboard_metric_user,dashboard.metric.user,model_dashboard_metric,group_dashboard_user,1,0,0,0
+access_dashboard_source_manager,dashboard.source.manager,model_dashboard_source,group_dashboard_manager,1,1,1,1
+access_dashboard_source_user,dashboard.source.user,model_dashboard_source,group_dashboard_user,1,0,0,0
+access_dashboard_filter_manager,dashboard.filter.manager,model_dashboard_filter,group_dashboard_manager,1,1,1,1
+access_dashboard_filter_user,dashboard.filter.user,model_dashboard_filter,group_dashboard_user,1,0,0,0
+access_dashboard_alert_manager,dashboard.alert.manager,model_dashboard_alert,group_dashboard_manager,1,1,1,1
+access_dashboard_alert_user,dashboard.alert.user,model_dashboard_alert,group_dashboard_user,1,0,0,0
+access_dashboard_cache,dashboard.cache,model_dashboard_cache,group_dashboard_manager,1,1,1,1
+access_dashboard_taxonomy_concept,dashboard.taxonomy.concept,model_dashboard_taxonomy_concept,group_dashboard_manager,1,1,1,1
+access_dashboard_taxonomy_concept_user,dashboard.taxonomy.concept.user,model_dashboard_taxonomy_concept,group_dashboard_user,1,0,0,0

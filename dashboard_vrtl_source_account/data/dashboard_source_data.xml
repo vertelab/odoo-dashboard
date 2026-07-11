@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Register account journals as a dashboard source -->
+    <record id="source_account_journals" model="dashboard.source">
+        <field name="name">Account Journals</field>
+        <field name="technical_name">account.journals</field>
+        <field name="model_name">dashboard.source.account.journals</field>
+        <field name="category">Finance</field>
+        <field name="source_type">service</field>
+        <field name="is_active" eval="True"/>
+    </record>
+</odoo>

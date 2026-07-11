@@ -1,0 +1,3 @@
+id,access_project_margin,dashboard.source.project.margin,model_dashboard_source_project_margin,,1,0,0,0
+id,access_project_wip,dashboard.source.project.wip,model_dashboard_source_project_wip,,1,0,0,0
+id,access_project_budget,dashboard.source.project.budget,model_dashboard_source_project_budget,,1,0,0,0

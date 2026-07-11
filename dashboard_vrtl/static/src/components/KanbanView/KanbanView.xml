@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="dashboard_vrtl.KanbanView">
+        <!-- Error state -->
+        <div t-if="state.isError" class="w-100 d-flex align-items-center justify-content-center" style="height: 90%;">
+            <div class="text-center">
+                <i class="fa fa-exclamation-triangle text-warning mb-2" style="font-size: 2rem;"/>
+                <h5 t-out="state.errorMessage"/>
+            </div>
+        </div>
+
+        <!-- Empty state -->
+        <div t-elif="!state.noGroupCards.length and !Object.keys(state.groups).length"
+             class="o_kanban_empty w-100 d-flex align-items-center justify-content-center" style="height: 90%;">
+            <div class="text-center">
+                <i class="fa fa-th-large text-muted mb-2" style="font-size: 2rem;"/>
+                <p class="text-muted">No journals match the current filters</p>
+            </div>
+        </div>
+
+        <!-- Grouped view -->
+        <div t-elif="Object.keys(state.groups).length" class="o_kanban_grouped">
+            <t t-foreach="Object.entries(state.groups)" t-as="[groupKey, groupCards]" t-key="groupKey">
+                <div class="o_kanban_group"
+                     t-att-class="'o_kanban_group' + (state.dropTarget === groupKey ? ' o_kanban_group_droptarget' : '')">
+                    <div class="o_kanban_group_header">
+                        <span class="o_kanban_group_label" t-esc="groupKey"/>
+                        <span class="o_kanban_group_count badge bg-secondary" t-esc="groupCards.length"/>
+                    </div>
+                    <div class="o_kanban_group_cards"
+                         t-att-class="'o_kanban_group_cards' + (isDraggable ? ' o_kanban_dropzone' : '')"
+                         t-on-dragover="(ev) => this.onDragOver(ev, groupKey)"
+                         t-on-dragleave="(ev) => this.onDragLeave(ev, groupKey)"
+                         t-on-drop="(ev) => this.onDrop(ev, groupKey)">
+                        <t t-if="groupCards.length">
+                            <KanbanCard t-foreach="groupCards" t-as="card" t-key="card.id"
+                                        card="card" config="kanbanConfig"
+                                        onCardClick="(card) => this.onCardClick(card)"
+                                        onActionClick="(action, card) => this.onActionClick(action, card)"
+                                        onDragStart="(card) => this.onDragStart(card)"
+                                        onDragEnd="(card) => this.onDragEnd(card)"/>
+                        </t>
+                        <div t-else="" class="o_kanban_group_empty">No records</div>
+                    </div>
+                </div>
+            </t>
+        </div>
+
+        <!-- Fluid grid (no grouping) -->
+        <div t-else="" class="o_kanban_fluid">
+            <KanbanCard t-foreach="state.noGroupCards" t-as="card" t-key="card.id"
+                        card="card" config="kanbanConfig"
+                        onCardClick="(card) => this.onCardClick(card)"
+                        onActionClick="(action, card) => this.onActionClick(action, card)"/>
+        </div>
+    </t>
+</templates>

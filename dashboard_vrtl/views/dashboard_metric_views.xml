@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="dashboard_metric_form_view" model="ir.ui.view">
+        <field name="name">dashboard.metric.form</field>
+        <field name="model">dashboard.metric</field>
+        <field name="arch" type="xml">
+            <form string="Metric">
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" placeholder="Metric Name"/></h1></div>
+                    <group col="2">
+                        <group>
+                            <field name="key"/>
+                            <field name="category"/>
+                            <field name="source_type"/>
+                            <field name="aggregation" invisible="source_type not in ('model','sql')"/>
+                            <field name="unit"/>
+                        </group>
+                        <group>
+                            <field name="active"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Kanban" name="kanban" invisible="source_type == 'composite'">
+                            <group col="2">
+                                <group string="Card Layout">
+                                    <field name="card_title_field"/>
+                                    <field name="card_subtitle_field"/>
+                                </group>
+                                <group string="State">
+                                    <field name="state_field"/>
+                                    <field name="state_colors" widget="ace" options="{'mode': 'json'}"/>
+                                    <field name="state_icons" widget="ace" options="{'mode': 'json'}"/>
+                                </group>
+                            </group>
+                            <group string="Card Fields">
+                                <field name="card_body_fields" widget="ace" options="{'mode': 'json'}"/>
+                                <field name="card_footer_fields" widget="ace" options="{'mode': 'json'}"/>
+                            </group>
+                            <group string="Actions &amp; Grouping">
+                                <field name="card_actions" widget="ace" options="{'mode': 'json'}"/>
+                                <field name="kanban_group_field"/>
+                            </group>
+                        </page>
+                        <page string="Source" name="source">
+                            <group invisible="source_type != 'model'">
+                                <field name="model_id"/>
+                                <field name="field_id" domain="[('model_id','=',model_id)]"/>
+                                <field name="date_field_id" domain="[('model_id','=',model_id)]"/>
+                                <field name="default_domain" widget="domain"/>
+                            </group>
+                            <group invisible="source_type != 'sql'">
+                                <field name="sql_query" widget="ace" options="{'mode': 'sql'}"/>
+                            </group>
+                            <group invisible="source_type != 'service'">
+                                <field name="service_model"/>
+                                <field name="service_method"/>
+                            </group>
+                            <group invisible="source_type != 'composite'">
+                                <field name="composite_formula"/>
+                                <field name="composite_metric_ids" widget="many2many_tags"/>
+                            </group>
+                        </page>
+                        <page string="Security">
+                            <group>
+                                <field name="respects_ir_rule"/>
+                                <field name="row_level_security"/>
+                                <field name="safe_for_shared_cache"/>
+                                <field name="ir_rule_check_result" widget="json"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="dashboard_metric_list_view" model="ir.ui.view">
+        <field name="name">dashboard.metric.list</field>
+        <field name="model">dashboard.metric</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="key"/>
+                <field name="source_type"/>
+                <field name="category"/>
+                <field name="active"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="dashboard_metric_action" model="ir.actions.act_window">
+        <field name="name">Metrics</field>
+        <field name="res_model">dashboard.metric</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

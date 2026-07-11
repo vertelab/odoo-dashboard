@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="slide_channel" model="slide.channel">
+        <field name="name">dashboard_vrtl — Build BI Dashboards</field>
+        <field name="description">Learn how to build enterprise BI dashboards with dashboard_vrtl. From metrics to alerts — a hands-on guide.</field>
+        <field name="channel_type">training</field>
+        <field name="is_published" eval="True"/>
+        <field name="enroll">public</field>
+        <field name="allow_comment" eval="True"/>
+        <field name="tag_ids" eval="[(6,0,[ref('website_slides.slide_tag_e_learning')])]"/>
+    </record>
+</odoo>

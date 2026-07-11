@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Dashboard Form View -->
+    <record id="dashboard_form_view" model="ir.ui.view">
+        <field name="name">dashboard.dashboard.form</field>
+        <field name="model">dashboard.dashboard</field>
+        <field name="arch" type="xml">
+            <form string="Dashboard">
+                <sheet>
+                    <div class="oe_title">
+                        <h1><field name="name" placeholder="Dashboard Name"/></h1>
+                    </div>
+                    <group col="2">
+                        <group>
+                            <field name="key"/>
+                            <field name="category"/>
+                            <field name="icon" widget="fa_icon"/>
+                            <field name="description"/>
+                        </group>
+                        <group>
+                            <field name="auto_reload_duration"/>
+                            <field name="cache_ttl"/>
+                            <field name="company_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Access">
+                            <group>
+                                <field name="access_by" widget="radio"/>
+                                <field name="group_ids" widget="many2many_tags" invisible="access_by != 'access_group'"/>
+                                <field name="user_ids" widget="many2many_tags" invisible="access_by != 'user'"/>
+                            </group>
+                        </page>
+                        <page string="Charts" name="charts">
+                            <field name="chart_ids">
+                                <list>
+                                    <field name="name"/>
+                                    <field name="chart_type"/>
+                                    <field name="metric_id"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Filters" name="filters">
+                            <field name="filter_ids">
+                                <list editable="bottom">
+                                    <field name="key"/>
+                                    <field name="name"/>
+                                    <field name="filter_type"/>
+                                    <field name="optional"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Alerts" name="alerts">
+                            <field name="alert_ids">
+                                <list editable="bottom">
+                                    <field name="name"/>
+                                    <field name="metric_id"/>
+                                    <field name="severity"/>
+                                    <field name="state"/>
+                                </list>
+                            </field>
+                        </page>
+                        <page string="Menu">
+                            <group>
+                                <field name="parent_menu_id"/>
+                                <field name="menu_sequence"/>
+                                <field name="menu_active"/>
+                            </group>
+                        </page>
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <!-- Dashboard List View -->
+    <record id="dashboard_list_view" model="ir.ui.view">
+        <field name="name">dashboard.dashboard.list</field>
+        <field name="model">dashboard.dashboard</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="key"/>
+                <field name="category"/>
+                <field name="chart_count"/>
+                <field name="menu_active"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Dashboard Search View -->
+    <record id="dashboard_search_view" model="ir.ui.view">
+        <field name="name">dashboard.dashboard.search</field>
+        <field name="model">dashboard.dashboard</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="key"/>
+                <field name="category"/>
+                <filter name="active_menus" string="Active Menus" domain="[('menu_active','=',True)]"/>
+            </search>
+        </field>
+    </record>
+
+    <!-- Dashboard Action -->
+    <record id="dashboard_action" model="ir.actions.act_window">
+        <field name="name">Dashboards</field>
+        <field name="res_model">dashboard.dashboard</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

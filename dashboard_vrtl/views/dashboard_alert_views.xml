@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="dashboard_alert_form_view" model="ir.ui.view">
+        <field name="name">dashboard.alert.form</field>
+        <field name="model">dashboard.alert</field>
+        <field name="arch" type="xml">
+            <form string="Alert Rule">
+                <sheet>
+                    <div class="oe_title"><h1><field name="name" placeholder="Alert Name"/></h1></div>
+                    <group col="2">
+                        <group>
+                            <field name="key"/>
+                            <field name="dashboard_id" invisible="1"/>
+                            <field name="metric_id" required="1"/>
+                            <field name="condition"/>
+                            <field name="severity"/>
+                        </group>
+                        <group>
+                            <field name="trigger_type"/>
+                            <field name="schedule" invisible="trigger_type != 'cron'"/>
+                            <field name="cooldown"/>
+                            <field name="max_per_day"/>
+                            <field name="state"/>
+                        </group>
+                    </group>
+                    <group string="Notification Channels">
+                        <field name="channels" widget="many2many_tags"/>
+                    </group>
+                    <group string="Recipients">
+                        <field name="recipients" widget="json"/>
+                    </group>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids"/>
+                    <field name="activity_ids"/>
+                    <field name="message_ids"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+    <record id="dashboard_alert_list_view" model="ir.ui.view">
+        <field name="name">dashboard.alert.list</field>
+        <field name="model">dashboard.alert</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="metric_id"/>
+                <field name="severity"/>
+                <field name="state"/>
+                <field name="last_triggered"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="dashboard_alert_action" model="ir.actions.act_window">
+        <field name="name">Alert Rules</field>
+        <field name="res_model">dashboard.alert</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

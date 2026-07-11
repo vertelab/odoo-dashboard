@@ -1,0 +1,774 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 1: Introduction                                          -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<record id="s1_header" model="slide.slide">
+    <field name="name">1. Introduction &amp; Architecture</field>
+    <field name="is_category" eval="True"/>
+    <field name="channel_id" ref="slide_channel"/>
+    <field name="sequence">10</field>
+</record>
+
+<record id="s1_welcome" model="slide.slide">
+    <field name="name">Welcome to dashboard_vrtl</field>
+    <field name="sequence">11</field>
+    <field name="slide_category">article</field>
+    <field name="channel_id" ref="slide_channel"/>
+    <field name="is_published" eval="True"/>
+    <field name="is_preview" eval="True"/>
+    <field name="completion_time">0.25</field>
+    <field name="description">
+<![CDATA[
+<h2>What is dashboard_vrtl?</h2>
+
+<p>dashboard_vrtl is an enterprise <strong>BI platform</strong> built for Odoo. It lets you create interactive dashboards with charts, KPIs, alerts, and drill-down navigation — all from within Odoo, using Odoo data.</p>
+
+<h3>Why dashboard_vrtl?</h3>
+
+<p>Odoo has reports and pivot tables — but no real dashboard builder. dashboard_vrtl fills that gap:</p>
+
+<ul>
+  <li><strong>18+ chart types</strong> — bar, line, pie, funnel, sankey, treemap, and more</li>
+  <li><strong>Semantic metrics</strong> — define "Revenue" once, use it everywhere</li>
+  <li><strong>Cross-chart interactivity</strong> — click a region, all charts filter</li>
+  <li><strong>Threshold alerts</strong> — get notified when stock drops below 10</li>
+  <li><strong>Dashboard-as-code</strong> — version your dashboards in Git</li>
+  <li><strong>AI-assisted</strong> — describe what you want, the AI builds it</li>
+</ul>
+
+<h3>Course overview</h3>
+
+<ol>
+  <li><strong>Core Models</strong> — Understanding dashboards, metrics, charts</li>
+  <li><strong>Metrics &amp; Data Sources</strong> — Connecting to Odoo data</li>
+  <li><strong>Building Dashboards</strong> — Step-by-step guide</li>
+  <li><strong>Alerts &amp; Security</strong> — Notifications and access control</li>
+  <li><strong>Dashboard-as-Code</strong> — YAML, version control, deployment</li>
+</ol>
+
+<p><strong>Time:</strong> ~45 minutes | <strong>Level:</strong> Beginner to Intermediate</p>
+]]>
+    </field>
+</record>
+
+<record id="s1_architecture" model="slide.slide">
+    <field name="name">Architecture Overview</field>
+    <field name="sequence">12</field>
+    <field name="slide_category">article</field>
+    <field name="channel_id" ref="slide_channel"/>
+    <field name="is_published" eval="True"/>
+    <field name="is_preview" eval="True"/>
+    <field name="completion_time">0.25</field>
+    <field name="description">
+<![CDATA[
+<h2>How dashboard_vrtl is built</h2>
+
+<p>dashboard_vrtl is modular — a core platform with domain-specific extensions:</p>
+
+<table class="table table-bordered">
+  <tr><th>Module</th><th>Purpose</th></tr>
+  <tr><td><code>dashboard_vrtl</code></td><td>Core: models, UI, alerts, caching</td></tr>
+  <tr><td><code>dashboard_vrtl_sales</code></td><td>Pre-built sales dashboards</td></tr>
+  <tr><td><code>dashboard_vrtl_finance</code></td><td>Pre-built finance dashboards</td></tr>
+  <tr><td><code>dashboard_vrtl_source_finance</code></td><td>52 financial report adapters</td></tr>
+  <tr><td><code>dashboard_vrtl_taxonomy</code></td><td>Swedish XBRL taxonomy integration</td></tr>
+  <tr><td><code>dashboard_vrtl_lms</code></td><td>This course!</td></tr>
+</table>
+
+<h3>The three-layer architecture</h3>
+
+<ol>
+  <li><strong>Metrics</strong> — Define <em>what</em> you measure (Revenue, Orders, Stock Level). One definition, used everywhere.</li>
+  <li><strong>Sources</strong> — Where data comes from (Odoo model, SQL query, or external adapter).</li>
+  <li><strong>Charts</strong> — How you visualize it (bar, line, KPI, table). Many charts can share one metric.</li>
+</ol>
+
+<h3>Data flow</h3>
+
+<p><strong>Metric → _read_group() → cache → chart → amCharts 5</strong></p>
+
+<p>Metrics use Odoo's built-in <code>_read_group()</code> for database-level aggregation. Results are cached per user and per filter combination. Charts render with amCharts 5 — the same library powering professional BI tools.</p>
+]]>
+    </field>
+</record>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 2: Core Models                                           -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<record id="s2_header" model="slide.slide">
+    <field name="name">2. Core Models — Dashboards, Metrics &amp; Charts</field>
+    <field name="is_category" eval="True"/>
+    <field name="channel_id" ref="slide_channel"/>
+    <field name="sequence">20</field>
+</record>
+
+<record id="s2_models" model="slide.slide">
+    <field name="name">The Three Core Models</field>
+    <field name="sequence">21</field>
+    <field name="slide_category">article</field>
+    <field name="channel_id" ref="slide_channel"/>
+    <field name="is_published" eval="True"/>
+    <field name="is_preview" eval="True"/>
+    <field name="completion_time">0.25</field>
+    <field name="description">
+<![CDATA[
+<h2>Dashboard → Metric → Chart</h2>
+
+<p>Everything in dashboard_vrtl revolves around three models:</p>
+
+<h3>1. Dashboard (<code>dashboard.dashboard</code>)</h3>
+<ul>
+  <li>A container for charts, filters, and alerts</li>
+  <li>Has access control (groups or users)</li>
+  <li>Auto-refresh every N seconds/minutes</li>
+  <li>Appears as a menu item in Odoo</li>
+</ul>
+
+<h3>2. Metric (<code>dashboard.metric</code>)</h3>
+<ul>
+  <li>Defines <strong>what</strong> you measure</li>
+  <li>Example: "Net Revenue = SUM of sale.order.amount_total where state is not draft/cancel"</li>
+  <li>Four source types: <code>model</code>, <code>sql</code>, <code>service</code>, <code>composite</code></li>
+  <li>A metric is reusable — one metric can power many charts</li>
+</ul>
+
+<h3>3. Chart (<code>dashboard.chart</code>)</h3>
+<ul>
+  <li>Connects a metric to a visualization</li>
+  <li>18+ chart types: bar, line, pie, funnel, sankey, treemap, KPI, table...</li>
+  <li>Has grouping, sorting, limits, and drill-down configuration</li>
+  <li>Per-chart access control (chart_group_ids)</li>
+</ul>
+
+<h3>How they connect</h3>
+
+<p><code>Dashboard → contains → Charts → reference → Metrics</code></p>
+<p>One Metric can power multiple Charts on different Dashboards. Change the Metric definition once — all Charts update.</p>
+]]>
+    </field>
+</record>
+
+<record id="s2_metrics_deep" model="slide.slide">
+    <field name="name">Metrics — The Heart of dashboard_vrtl</field>
+    <field name="sequence">22</field>
+    <field name="slide_category">article</field>
+    <field name="channel_id" ref="slide_channel"/>
+    <field name="is_published" eval="True"/>
+    <field name="is_preview" eval="True"/>
+    <field name="completion_time">0.5</field>
+    <field name="description">
+<![CDATA[
+<h2>Defining a Metric</h2>
+
+<p>A metric answers one question: <strong>"What is X?"</strong></p>
+
+<h3>Metric fields that matter</h3>
+<ul>
+  <li><strong>source_type</strong>: <code>model</code> (Odoo model), <code>sql</code> (custom query), <code>service</code> (adapter), <code>composite</code> (formula)</li>
+  <li><strong>model_id / field_id</strong>: Which Odoo model and field to measure</li>
+  <li><strong>aggregation</strong>: sum, avg, count, min, max</li>
+  <li><strong>default_domain</strong>: Always-active filters, e.g. exclude drafts and cancellations</li>
+  <li><strong>date_field_id</strong>: Which field is the "time" dimension</li>
+  <li><strong>unit</strong>: monetary, percentage, integer, float</li>
+</ul>
+
+<h3>Example: Net Revenue Metric</h3>
+<table class="table table-bordered">
+  <tr><th>Field</th><th>Value</th></tr>
+  <tr><td>name</td><td>Net Revenue</td></tr>
+  <tr><td>key</td><td>sales.net_revenue</td></tr>
+  <tr><td>source_type</td><td>model</td></tr>
+  <tr><td>model_id</td><td>sale.order</td></tr>
+  <tr><td>field_id</td><td>amount_total</td></tr>
+  <tr><td>aggregation</td><td>sum</td></tr>
+  <tr><td>default_domain</td><td>[['state','not in',['draft','cancel']]]</td></tr>
+  <tr><td>date_field_id</td><td>date_order</td></tr>
+  <tr><td>unit</td><td>monetary</td></tr>
+</table>
+
+<h3>Metric key — why it matters</h3>
+<p>The <code>key</code> field is a unique identifier like <code>"sales.net_revenue"</code>. It's used for:</p>
+<ul>
+  <li>Cross-referencing in YAML dashboard definitions</li>
+  <li>Composite metrics (formulas reference keys)</li>
+  <li>Dashboard-as-code portability across instances</li>
+</ul>
+]]>
+    </field>
+</record>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 3: Building Your First Dashboard                         -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<record id="s3_header" model="slide.slide">
+    <field name="name">3. Building Your First Dashboard</field>
+    <field name="is_category" eval="True"/>
+    <field name="channel_id" ref="slide_channel"/>
+    <field name="sequence">30</field>
+</record>
+
+<record id="s3_step1" model="slide.slide">
+    <field name="name">Step 1: Create a Dashboard</field>
+    <field name="sequence">31</field>
+    <field name="slide_category">article</field>
+    <field name="channel_id" ref="slide_channel"/>
+    <field name="is_published" eval="True"/>
+    <field name="is_preview" eval="True"/>
+    <field name="completion_time">0.25</field>
+    <field name="description">
+<![CDATA[
+<h2>Creating your first dashboard</h2>
+
+<h3>Via the Odoo UI</h3>
+<ol>
+  <li>Go to <strong>BI Dashboard → Dashboards → Create</strong></li>
+  <li>Fill in:
+    <ul>
+      <li><strong>Name</strong>: "My Sales Dashboard"</li>
+      <li><strong>Key</strong>: "my_sales" (unique identifier)</li>
+      <li><strong>Category</strong>: "Sales"</li>
+      <li><strong>Auto-Refresh</strong>: 5 Minutes</li>
+      <li><strong>Cache TTL</strong>: 300 (seconds)</li>
+    </ul>
+  </li>
+  <li>Under <strong>Access</strong>, set who can view it</li>
+  <li>Under <strong>Menu</strong>, choose where it appears in the Odoo menu</li>
+  <li>Click <strong>Save</strong></li>
+</ol>
+
+<h3>Via YAML (dashboard-as-code)</h3>
+<p>Create a file <code>my_sales.yaml</code>:</p>
+<pre><code>dashboard:
+  key: my_sales
+  name: "My Sales Dashboard"
+  category: Sales
+  auto_refresh: 300000
+  cache_ttl: 300
+
+filters:
+  - key: period
+    type: date_range
+    label: "Period"
+    default:
+      from: this_month_start
+      to: today</code></pre>
+
+<p>Then load it: <code>Dashboard.load_from_module_yaml('my_module', 'data/my_sales.yaml')</code></p>
+]]>
+    </field>
+</record>
+
+<record id="s3_step2" model="slide.slide">
+    <field name="name">Step 2: Define a Metric</field>
+    <field name="sequence">32</field>
+    <field name="slide_category">article</field>
+    <field name="channel_id" ref="slide_channel"/>
+    <field name="is_published" eval="True"/>
+    <field name="is_preview" eval="True"/>
+    <field name="completion_time">0.5</field>
+    <field name="description">
+<![CDATA[
+<h2>Creating your first metric</h2>
+
+<h3>Metric: Net Revenue</h3>
+
+<p>Go to <strong>BI Dashboard → Metrics → Create</strong> and fill in:</p>
+
+<table class="table table-bordered">
+  <tr><th>Field</th><th>Value</th><th>Why</th></tr>
+  <tr><td>Name</td><td>Net Revenue</td><td>Human-readable name</td></tr>
+  <tr><td>Key</td><td>sales.net_revenue</td><td>Unique identifier</td></tr>
+  <tr><td>Source Type</td><td>Odoo Model</td><td>Simple model binding</td></tr>
+  <tr><td>Model</td><td>sale.order</td><td>Sales orders table</td></tr>
+  <tr><td>Field</td><td>amount_total</td><td>Total order amount</td></tr>
+  <tr><td>Aggregation</td><td>Sum</td><td>Add all amounts</td></tr>
+  <tr><td>Unit</td><td>Monetary</td><td>Display as currency</td></tr>
+  <tr><td>Date Field</td><td>date_order</td><td>Time dimension</td></tr>
+  <tr><td>Domain</td><td>[['state','not in',['draft','cancel']]]</td><td>Exclude drafts</td></tr>
+</table>
+
+<h3>What happens behind the scenes</h3>
+<p>When this metric is queried, dashboard_vrtl calls:</p>
+<pre><code>self.env['sale.order']._read_group(
+    domain=[('state','not in',['draft','cancel'])],
+    groupby=[],
+    aggregates=['amount_total:sum'],
+)</code></pre>
+<p>This runs a <strong>single SQL query</strong> with GROUP BY in the database — not Python loops!</p>
+
+<h3>Security auto-detection</h3>
+<p>dashboard_vrtl automatically checks if the model has ir.rules and sets <code>row_level_security=True</code>. This means each user sees only their authorized data.</p>
+]]>
+    </field>
+</record>
+
+<record id="s3_step3" model="slide.slide">
+    <field name="name">Step 3: Add Charts</field>
+    <field name="sequence">33</field>
+    <field name="slide_category">article</field>
+    <field name="channel_id" ref="slide_channel"/>
+    <field name="is_published" eval="True"/>
+    <field name="is_preview" eval="True"/>
+    <field name="completion_time">0.5</field>
+    <field name="description">
+<![CDATA[
+<h2>Adding charts to your dashboard</h2>
+
+<p>Now that you have a dashboard and a metric, let's add visualizations.</p>
+
+<h3>Chart 1: Revenue KPI</h3>
+<p>Go to <strong>BI Dashboard → Charts → Create</strong>:</p>
+<table class="table table-bordered">
+  <tr><th>Field</th><th>Value</th></tr>
+  <tr><td>Name</td><td>Revenue (KPI)</td></tr>
+  <tr><td>Dashboard</td><td>My Sales Dashboard</td></tr>
+  <tr><td>Metric</td><td>Net Revenue</td></tr>
+  <tr><td>Chart Type</td><td>KPI</td></tr>
+  <tr><td>Comparison</td><td>Previous Period (%)</td></tr>
+</table>
+
+<h3>Chart 2: Revenue Trend (Line Chart)</h3>
+<table class="table table-bordered">
+  <tr><th>Field</th><th>Value</th></tr>
+  <tr><td>Name</td><td>Revenue Trend</td></tr>
+  <tr><td>Dashboard</td><td>My Sales Dashboard</td></tr>
+  <tr><td>Metric</td><td>Net Revenue</td></tr>
+  <tr><td>Chart Type</td><td>Line Chart</td></tr>
+  <tr><td>Group By</td><td>date_order</td></tr>
+  <tr><td>Time Range</td><td>Month</td></tr>
+  <tr><td>Limit</td><td>12 (rolling 12 months)</td></tr>
+</table>
+
+<h3>Chart 3: Top Products (Bar Chart)</h3>
+<p>Create a <strong>second metric</strong> first for product revenue:</p>
+<ul>
+  <li>Model: <code>sale.order.line</code></li>
+  <li>Field: <code>price_subtotal</code></li>
+  <li>Group By: <code>product_id</code></li>
+</ul>
+<p>Then create the chart with <strong>Bar Chart</strong> type, limit 5, sort descending.</p>
+
+<h3>Layout tips</h3>
+<ul>
+  <li>Put KPIs at the top (w=2-3, h=2)</li>
+  <li>Main chart in the center (w=6, h=4)</li>
+  <li>Supplementary charts on the right or bottom</li>
+  <li>Max ~8-12 charts per dashboard</li>
+</ul>
+]]>
+    </field>
+</record>
+
+<record id="s3_step4" model="slide.slide">
+    <field name="name">Step 4: Filters &amp; Interactivity</field>
+    <field name="sequence">34</field>
+    <field name="slide_category">article</field>
+    <field name="channel_id" ref="slide_channel"/>
+    <field name="is_published" eval="True"/>
+    <field name="is_preview" eval="True"/>
+    <field name="completion_time">0.5</field>
+    <field name="description">
+<![CDATA[
+<h2>Making dashboards interactive</h2>
+
+<h3>Global Filters</h3>
+<p>Add a filter that affects <strong>all compatible charts</strong>:</p>
+<ol>
+  <li>Go to your dashboard, scroll to the <strong>Filters</strong> tab</li>
+  <li>Add a filter:
+    <ul>
+      <li><strong>Key</strong>: "period"</li>
+      <li><strong>Type</strong>: Date Range</li>
+      <li><strong>Default From</strong>: "this_month_start"</li>
+      <li><strong>Default To</strong>: "today"</li>
+      <li><strong>Shortcuts</strong>: [{"label":"This Month","from":"this_month_start","to":"today"}]</li>
+    </ul>
+  </li>
+</ol>
+<p>Now a filter bar appears above your charts. Change the period — all charts update together.</p>
+
+<h3>Cross-Chart Filtering</h3>
+<p><strong>Single-click</strong> any chart element to filter the entire dashboard:</p>
+<ul>
+  <li>Click "Nord" in a pie chart → all charts filter to Nord region</li>
+  <li>Click "Product A" → both Nord and Product A filters stack</li>
+  <li>Click ✕ on a filter badge to remove it</li>
+</ul>
+
+<h3>Drill-Down</h3>
+<p><strong>Double-click</strong> a chart element to drill into details:</p>
+<ul>
+  <li>Double-click "Nord" → see products within Nord</li>
+  <li>Double-click "Product A" → see customers who bought it</li>
+  <li>Breadcrumbs show: Dashboard > Nord > Product A</li>
+  <li>Click any breadcrumb to go back</li>
+</ul>
+
+<h3>Filter compatibility</h3>
+<p>Not all charts support all filters. A P&amp;L statement doesn't have a "customer" filter — it simply ignores incompatible filters. No errors, no confusion.</p>
+]]>
+    </field>
+</record>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 4: Alerts & Security                                     -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<record id="s4_header" model="slide.slide">
+    <field name="name">4. Alerts &amp; Security</field>
+    <field name="is_category" eval="True"/>
+    <field name="channel_id" ref="slide_channel"/>
+    <field name="sequence">40</field>
+</record>
+
+<record id="s4_alerts" model="slide.slide">
+    <field name="name">Setting Up Alerts</field>
+    <field name="sequence">41</field>
+    <field name="slide_category">article</field>
+    <field name="channel_id" ref="slide_channel"/>
+    <field name="is_published" eval="True"/>
+    <field name="completion_time">0.5</field>
+    <field name="description">
+<![CDATA[
+<h2>Get notified when things matter</h2>
+
+<p>Alerts monitor a metric and trigger when a condition is met.</p>
+
+<h3>Creating an alert</h3>
+<p>Go to <strong>BI Dashboard → Alert Rules → Create</strong>:</p>
+
+<table class="table table-bordered">
+  <tr><th>Field</th><th>Value</th><th>Notes</th></tr>
+  <tr><td>Name</td><td>Low Stock Alert</td><td>Descriptive name</td></tr>
+  <tr><td>Metric</td><td>Stock Level</td><td>What to monitor</td></tr>
+  <tr><td>Condition</td><td>value &lt; 10</td><td>Triggers when stock &lt; 10</td></tr>
+  <tr><td>Severity</td><td>Warning</td><td>Info / Warning / Critical</td></tr>
+  <tr><td>Schedule</td><td>0 */4 * * *</td><td>Every 4 hours</td></tr>
+  <tr><td>Cooldown</td><td>3600</td><td>Min 1 hour between alerts</td></tr>
+  <tr><td>Channels</td><td>notification, activity</td><td>Where to notify</td></tr>
+</table>
+
+<h3>Condition syntax</h3>
+<p>Available variables:</p>
+<ul>
+  <li><code>value</code> — current metric value</li>
+  <li><code>previous_value</code> — value from last evaluation</li>
+  <li><code>delta</code> — percentage change: ((value - previous) / previous) * 100</li>
+</ul>
+
+<p>Examples:</p>
+<ul>
+  <li><code>value &lt; 10</code> — simple threshold</li>
+  <li><code>delta &lt; -30 and value &lt; 50000</code> — sharp drop AND low baseline</li>
+  <li><code>value &gt;= 1000000</code> — exceeded target</li>
+</ul>
+
+<h3>Notification Channels</h3>
+<ul>
+  <li><strong>notification</strong>: Message in Odoo Discuss "Dashboard Alerts" channel</li>
+  <li><strong>activity</strong>: Task in recipient's "To-Do" list — requires acknowledgment</li>
+</ul>
+
+<h3>Anti-flood protection</h3>
+<ul>
+  <li><strong>Cooldown</strong>: Minimum seconds between repeated alerts</li>
+  <li><strong>State machine</strong>: ok → triggered → acknowledged → ok</li>
+  <li><strong>Auto-reset</strong>: If condition is no longer met, alert auto-resolves</li>
+</ul>
+]]>
+    </field>
+</record>
+
+<record id="s4_security" model="slide.slide">
+    <field name="name">Security &amp; Access Control</field>
+    <field name="sequence">42</field>
+    <field name="slide_category">article</field>
+    <field name="channel_id" ref="slide_channel"/>
+    <field name="is_published" eval="True"/>
+    <field name="completion_time">0.25</field>
+    <field name="description">
+<![CDATA[
+<h2>Four layers of security</h2>
+
+<h3>1. User Groups (who can even open the menu?)</h3>
+<ul>
+  <li><strong>group_dashboard_user</strong>: View dashboards assigned to you</li>
+  <li><strong>group_dashboard_manager</strong>: Create, edit, delete dashboards</li>
+</ul>
+
+<h3>2. Dashboard-Level Access</h3>
+<ul>
+  <li><strong>access_by</strong>: "Access Groups" or "Users"</li>
+  <li><strong>group_ids / user_ids</strong>: Who can see this dashboard</li>
+  <li>Empty = open to all users</li>
+</ul>
+
+<h3>3. Chart-Level Access</h3>
+<ul>
+  <li><strong>chart_group_ids</strong>: Only these groups see this chart</li>
+  <li>Example: "KPI: Margin" visible only to Managers</li>
+  <li>Enforced via ir.rule — not just frontend hiding</li>
+</ul>
+
+<h3>4. Row-Level Data Security</h3>
+<ul>
+  <li>Odoo ir.rules applied automatically for model-based metrics</li>
+  <li>Sales rep only sees their team's data</li>
+  <li>CFO sees all companies</li>
+  <li>SQL metrics use security bridge: <code>WHERE id = ANY(authorized_ids)</code></li>
+</ul>
+
+<h3>Cache Security</h3>
+<p>Cached data includes the user's ID in the cache key — one user can never see another user's data through the cache.</p>
+]]>
+    </field>
+</record>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 5: Dashboard-as-Code                                     -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<record id="s5_header" model="slide.slide">
+    <field name="name">5. Dashboard-as-Code</field>
+    <field name="is_category" eval="True"/>
+    <field name="channel_id" ref="slide_channel"/>
+    <field name="sequence">50</field>
+</record>
+
+<record id="s5_yaml" model="slide.slide">
+    <field name="name">YAML Format &amp; Deployment</field>
+    <field name="sequence">51</field>
+    <field name="slide_category">article</field>
+    <field name="channel_id" ref="slide_channel"/>
+    <field name="is_published" eval="True"/>
+    <field name="completion_time">0.5</field>
+    <field name="description">
+<![CDATA[
+<h2>Dashboard-as-Code — Version Your Dashboards</h2>
+
+<p>Instead of clicking through the UI, you can define dashboards in YAML files. This gives you:</p>
+<ul>
+  <li><strong>Version control</strong> — track changes in Git</li>
+  <li><strong>Code review</strong> — PR before deploying</li>
+  <li><strong>Reproducibility</strong> — same dashboard in dev, staging, prod</li>
+  <li><strong>Portability</strong> — deploy to multiple Odoo instances</li>
+</ul>
+
+<h3>Complete YAML Example</h3>
+<pre><code>dashboard:
+  key: cfo_daily
+  name: "CFO Daily Dashboard"
+  category: Finance
+  auto_refresh: 900000
+
+filters:
+  - key: period
+    type: date_range
+    label: "Period"
+    default: {from: this_month_start, to: today}
+
+metrics:
+  - key: finance.revenue
+    label: "Revenue"
+    source_type: model
+    model: account.move.line
+    field: credit
+    aggregation: sum
+    unit: monetary
+    date_field: date
+    domain:
+      - [parent_state, "=", posted]
+      - [account_id.account_type, in, [income, income_other]]
+
+charts:
+  - key: kpi_revenue
+    type: kpi
+    metric: finance.revenue
+    label: "Revenue"
+    layout: {x: 0, y: 0, w: 3, h: 2}
+    comparison: previous_period
+
+  - key: chart_trend
+    type: line
+    metric: finance.revenue
+    label: "Revenue Trend"
+    layout: {x: 0, y: 2, w: 6, h: 4}
+    config:
+      group_by: date:month</code></pre>
+
+<h3>Loading YAML</h3>
+<p>In your module's data XML:</p>
+<pre><code>&lt;function model="dashboard.dashboard"
+    name="load_from_module_yaml"
+    eval="['my_module', 'data/my_dashboard.yaml']"/&gt;</code></pre>
+
+<h3>AI-Assisted Dashboard Creation</h3>
+<p>dashboard_vrtl includes an AI skill (SKILL.md). Just describe what you want:</p>
+<p><em>"I need a sales dashboard showing net revenue per month, top 5 products, and an alert when daily revenue drops 30% below average."</em></p>
+<p>The AI will generate the complete YAML for you.</p>
+]]>
+    </field>
+</record>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- SECTION 6: Quiz                                                   -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+
+<record id="s6_header" model="slide.slide">
+    <field name="name">6. Test Your Knowledge</field>
+    <field name="is_category" eval="True"/>
+    <field name="channel_id" ref="slide_channel"/>
+    <field name="sequence">60</field>
+</record>
+
+<record id="s6_quiz" model="slide.slide">
+    <field name="name">dashboard_vrtl — Final Quiz</field>
+    <field name="sequence">61</field>
+    <field name="slide_category">quiz</field>
+    <field name="channel_id" ref="slide_channel"/>
+    <field name="is_published" eval="True"/>
+    <field name="completion_time">0.25</field>
+    <field name="quiz_first_attempt_reward">100</field>
+    <field name="quiz_second_attempt_reward">75</field>
+    <field name="description">Test your understanding of dashboard_vrtl core concepts.</field>
+</record>
+
+<!-- Q1: Three core models -->
+<record id="q1" model="slide.question">
+    <field name="question">What are the three core models in dashboard_vrtl?</field>
+    <field name="sequence">1</field>
+    <field name="slide_id" ref="s6_quiz"/>
+</record>
+<record id="q1a1" model="slide.answer">
+    <field name="text_value">Dashboard, Metric, Chart</field>
+    <field name="sequence">1</field>
+    <field name="is_correct" eval="True"/>
+    <field name="comment">Correct! Dashboard contains Charts, Charts reference Metrics, Metrics define the data.</field>
+    <field name="question_id" ref="q1"/>
+</record>
+<record id="q1a2" model="slide.answer">
+    <field name="text_value">Report, Pivot, Graph</field>
+    <field name="sequence">2</field>
+    <field name="is_correct" eval="False"/>
+    <field name="comment">These are standard Odoo features. dashboard_vrtl uses Dashboard, Metric, and Chart.</field>
+    <field name="question_id" ref="q1"/>
+</record>
+<record id="q1a3" model="slide.answer">
+    <field name="text_value">Source, Filter, Alert</field>
+    <field name="sequence">3</field>
+    <field name="is_correct" eval="False"/>
+    <field name="comment">These are supporting models. The core three are Dashboard, Metric, and Chart.</field>
+    <field name="question_id" ref="q1"/>
+</record>
+
+<!-- Q2: Metric source types -->
+<record id="q2" model="slide.question">
+    <field name="question">Which metric source_type should you use for a simple SUM of a sale.order field?</field>
+    <field name="sequence">2</field>
+    <field name="slide_id" ref="s6_quiz"/>
+</record>
+<record id="q2a1" model="slide.answer">
+    <field name="text_value">model</field>
+    <field name="sequence">1</field>
+    <field name="is_correct" eval="True"/>
+    <field name="comment">Correct! Use model for direct Odoo model bindings. It uses _read_group() for database-level aggregation.</field>
+    <field name="question_id" ref="q2"/>
+</record>
+<record id="q2a2" model="slide.answer">
+    <field name="text_value">sql</field>
+    <field name="sequence">2</field>
+    <field name="is_correct" eval="False"/>
+    <field name="comment">SQL is for complex queries that _read_group() can't handle. Simple aggregations should use model.</field>
+    <field name="question_id" ref="q2"/>
+</record>
+<record id="q2a3" model="slide.answer">
+    <field name="text_value">composite</field>
+    <field name="sequence">3</field>
+    <field name="is_correct" eval="False"/>
+    <field name="comment">Composite is for formulas combining multiple metrics, e.g. revenue / orders.</field>
+    <field name="question_id" ref="q2"/>
+</record>
+
+<!-- Q3: Alert condition -->
+<record id="q3" model="slide.question">
+    <field name="question">Which condition triggers an alert when a metric drops more than 30% compared to its previous value?</field>
+    <field name="sequence">3</field>
+    <field name="slide_id" ref="s6_quiz"/>
+</record>
+<record id="q3a1" model="slide.answer">
+    <field name="text_value">delta &lt; -30</field>
+    <field name="sequence">1</field>
+    <field name="is_correct" eval="True"/>
+    <field name="comment">Correct! delta is the percentage change from the previous evaluation.</field>
+    <field name="question_id" ref="q3"/>
+</record>
+<record id="q3a2" model="slide.answer">
+    <field name="text_value">value &lt; -30</field>
+    <field name="sequence">2</field>
+    <field name="is_correct" eval="False"/>
+    <field name="comment">This checks if the value is less than -30 (a negative number), not a 30% drop.</field>
+    <field name="question_id" ref="q3"/>
+</record>
+<record id="q3a3" model="slide.answer">
+    <field name="text_value">previous_value &lt; value * 0.7</field>
+    <field name="sequence">3</field>
+    <field name="is_correct" eval="False"/>
+    <field name="comment">Close but not necessary — use the simpler delta &lt; -30 instead.</field>
+    <field name="question_id" ref="q3"/>
+</record>
+
+<!-- Q4: Cache security -->
+<record id="q4" model="slide.question">
+    <field name="question">How does dashboard_vrtl prevent one user from seeing another user's data through the cache?</field>
+    <field name="sequence">4</field>
+    <field name="slide_id" ref="s6_quiz"/>
+</record>
+<record id="q4a1" model="slide.answer">
+    <field name="text_value">Cache key includes user_id for row-level security metrics</field>
+    <field name="sequence">1</field>
+    <field name="is_correct" eval="True"/>
+    <field name="comment">Correct! user_id is part of the SHA-256 cache key, so different users get different cache entries.</field>
+    <field name="question_id" ref="q4"/>
+</record>
+<record id="q4a2" model="slide.answer">
+    <field name="text_value">All cache entries are encrypted per user</field>
+    <field name="sequence">2</field>
+    <field name="is_correct" eval="False"/>
+    <field name="comment">Encryption is not used. The cache key contains the user_id, making separate entries.</field>
+    <field name="question_id" ref="q4"/>
+</record>
+
+<!-- Q5: Cross-chart -->
+<record id="q5" model="slide.question">
+    <field name="question">What happens when you single-click a chart element in dashboard_vrtl?</field>
+    <field name="sequence">5</field>
+    <field name="slide_id" ref="s6_quiz"/>
+</record>
+<record id="q5a1" model="slide.answer">
+    <field name="text_value">All compatible charts on the dashboard are filtered by the clicked value</field>
+    <field name="sequence">1</field>
+    <field name="is_correct" eval="True"/>
+    <field name="comment">Correct! This is cross-chart filtering — the core interactivity feature.</field>
+    <field name="question_id" ref="q5"/>
+</record>
+<record id="q5a2" model="slide.answer">
+    <field name="text_value">The clicked chart zooms in to show details (drill-down)</field>
+    <field name="sequence">2</field>
+    <field name="is_correct" eval="False"/>
+    <field name="comment">Drill-down is double-click, not single-click. Single-click filters the entire dashboard.</field>
+    <field name="question_id" ref="q5"/>
+</record>
+<record id="q5a3" model="slide.answer">
+    <field name="text_value">Only the clicked chart updates; other charts stay the same</field>
+    <field name="sequence">3</field>
+    <field name="is_correct" eval="False"/>
+    <field name="comment">All compatible charts update together. Incompatible charts (e.g. P&amp;L with no region filter) stay unchanged.</field>
+    <field name="question_id" ref="q5"/>
+</record>
+
+</odoo>

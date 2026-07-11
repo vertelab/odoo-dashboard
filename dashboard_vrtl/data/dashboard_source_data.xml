@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Register builtin source types -->
+    <record id="source_type_model" model="dashboard.source">
+        <field name="name">Odoo Model</field>
+        <field name="technical_name">model</field>
+        <field name="model_name">dashboard.source.model</field>
+        <field name="category">Builtin</field>
+        <field name="source_type">model</field>
+        <field name="is_builtin" eval="True"/>
+    </record>
+</odoo>

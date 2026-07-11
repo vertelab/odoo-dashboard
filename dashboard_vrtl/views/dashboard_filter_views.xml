@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="dashboard_filter_form_view" model="ir.ui.view">
+        <field name="name">dashboard.filter.form</field>
+        <field name="model">dashboard.filter</field>
+        <field name="arch" type="xml">
+            <form string="Filter">
+                <sheet>
+                    <group>
+                        <field name="dashboard_id" invisible="1"/>
+                        <field name="key"/>
+                        <field name="name"/>
+                        <field name="filter_type"/>
+                        <field name="optional"/>
+                        <field name="sequence"/>
+                    </group>
+                    <group invisible="filter_type != 'date_range'">
+                        <field name="default_from"/>
+                        <field name="default_to"/>
+                        <field name="shortcuts" widget="json"/>
+                    </group>
+                    <group invisible="filter_type != 'many2one'">
+                        <field name="model"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>

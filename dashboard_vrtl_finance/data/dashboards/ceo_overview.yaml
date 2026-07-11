@@ -1,0 +1,198 @@
+dashboard:
+  key: ceo_overview
+  name: CEO Overview
+  name_sv: VD Översikt
+  icon: fa-building
+  category: Finance
+  auto_refresh: 900000
+  cache_ttl: 900
+  groups:
+    - CEO / Ledning
+
+filters:
+  - key: period
+    type: date_range
+    label: Period
+    default:
+      from: this_year_start
+      to: today
+
+metrics:
+  - key: finance.net_revenue
+    label: Net Revenue
+    source_type: model
+    model: account.move.line
+    field: credit
+    aggregation: sum
+    unit: monetary
+    date_field: date
+    domain:
+      - [parent_state, "=", posted]
+      - [account_id.account_type, in, [income, income_other]]
+
+  - key: finance.cost_of_sales
+    label: Cost of Sales
+    source_type: model
+    model: account.move.line
+    field: debit
+    aggregation: sum
+    unit: monetary
+    date_field: date
+    domain:
+      - [parent_state, "=", posted]
+      - [account_id.account_type, "=", expense_direct_cost]
+
+  - key: finance.operating_expenses
+    label: Operating Expenses
+    source_type: model
+    model: account.move.line
+    field: debit
+    aggregation: sum
+    unit: monetary
+    date_field: date
+    domain:
+      - [parent_state, "=", posted]
+      - [account_id.account_type, in, [expense, expense_depreciation]]
+
+  - key: finance.cash_balance
+    label: Cash Balance
+    source_type: model
+    model: account.move.line
+    field: balance
+    aggregation: sum
+    unit: monetary
+    domain:
+      - [parent_state, "=", posted]
+      - [account_id.account_type, in, [asset_cash, liability_credit_card]]
+
+  - key: finance.ar_total
+    label: AR Total
+    source_type: model
+    model: account.move.line
+    field: balance
+    aggregation: sum
+    unit: monetary
+    domain:
+      - [parent_state, "=", posted]
+      - [account_id.account_type, "=", asset_receivable]
+      - [reconciled, "=", false]
+
+  - key: finance.ap_total
+    label: AP Total
+    source_type: model
+    model: account.move.line
+    field: balance
+    aggregation: sum
+    unit: monetary
+    domain:
+      - [parent_state, "=", posted]
+      - [account_id.account_type, "=", liability_payable]
+      - [reconciled, "=", false]
+
+  - key: finance.headcount
+    label: Headcount
+    source_type: model
+    model: hr.employee
+    field: id
+    aggregation: count
+    unit: integer
+    domain:
+      - [active, "=", true]
+
+charts:
+  - key: kpi_revenue
+    type: kpi
+    metric: finance.net_revenue
+    label: Revenue MTD
+    comparison: previous_period
+    layout: {x: 0, y: 0, w: 2, h: 2}
+
+  - key: kpi_gross_margin
+    type: kpi
+    metric: finance.net_revenue
+    label: Gross Margin
+    comparison: previous_period
+    layout: {x: 2, y: 0, w: 2, h: 2}
+
+  - key: kpi_ebitda
+    type: kpi
+    metric: finance.operating_expenses
+    label: OpEx MTD
+    comparison: previous_period
+    layout: {x: 4, y: 0, w: 2, h: 2}
+
+  - key: kpi_cash
+    type: kpi
+    metric: finance.cash_balance
+    label: Cash Balance
+    layout: {x: 6, y: 0, w: 2, h: 2}
+
+  - key: kpi_headcount
+    type: kpi
+    metric: finance.headcount
+    label: Headcount
+    layout: {x: 8, y: 0, w: 2, h: 2}
+
+  - key: kpi_ar
+    type: kpi
+    metric: finance.ar_total
+    label: AR Outstanding
+    layout: {x: 10, y: 0, w: 2, h: 2}
+
+  - key: chart_revenue_trend
+    type: area_chart
+    metric: finance.net_revenue
+    label: Revenue 12 Months
+    layout: {x: 0, y: 2, w: 6, h: 4}
+    config:
+      group_by: date:month
+
+  - key: chart_expenses_trend
+    type: stackedcolumn_chart
+    metric: finance.operating_expenses
+    label: Expenses by Month
+    layout: {x: 6, y: 2, w: 6, h: 4}
+    config:
+      group_by: date:month
+
+layout:
+  - chartId: kpi_revenue
+    x: 0
+    y: 0
+    w: 2
+    h: 2
+  - chartId: kpi_gross_margin
+    x: 2
+    y: 0
+    w: 2
+    h: 2
+  - chartId: kpi_ebitda
+    x: 4
+    y: 0
+    w: 2
+    h: 2
+  - chartId: kpi_cash
+    x: 6
+    y: 0
+    w: 2
+    h: 2
+  - chartId: kpi_headcount
+    x: 8
+    y: 0
+    w: 2
+    h: 2
+  - chartId: kpi_ar
+    x: 10
+    y: 0
+    w: 2
+    h: 2
+  - chartId: chart_revenue_trend
+    x: 0
+    y: 2
+    w: 6
+    h: 4
+  - chartId: chart_expenses_trend
+    x: 6
+    y: 2
+    w: 6
+    h: 4

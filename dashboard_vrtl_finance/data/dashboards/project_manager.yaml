@@ -1,0 +1,140 @@
+dashboard:
+  key: project_manager
+  name: Project Manager
+  name_sv: Projektledare
+  icon: fa-tasks
+  category: Finance
+  auto_refresh: 900000
+  cache_ttl: 600
+
+filters:
+  - key: period
+    type: date_range
+    label: Period
+    default:
+      from: this_month_start
+      to: today
+  - key: project
+    type: many2one
+    label: Project
+    model: project.project
+
+metrics:
+  - key: finance.project_revenue
+    label: Project Revenue
+    source_type: model
+    model: account.analytic.line
+    field: amount
+    aggregation: sum
+    unit: monetary
+    date_field: date
+    domain:
+      - [amount, "<", 0]
+
+  - key: finance.project_cost
+    label: Project Cost
+    source_type: model
+    model: account.analytic.line
+    field: amount
+    aggregation: sum
+    unit: monetary
+    date_field: date
+    domain:
+      - [amount, ">", 0]
+
+  - key: finance.project_margin
+    label: Project Margin
+    source_type: composite
+    composite_formula: "{finance.project_revenue} + {finance.project_cost}"
+    composite_metric_ids: [finance.project_revenue, finance.project_cost]
+    unit: monetary
+
+  - key: finance.project_hours
+    label: Billable Hours
+    source_type: model
+    model: account.analytic.line
+    field: unit_amount
+    aggregation: sum
+    unit: float
+    date_field: date
+
+  - key: finance.wip_unbilled
+    label: WIP Unbilled
+    source_type: model
+    model: account.analytic.line
+    field: amount
+    aggregation: sum
+    unit: monetary
+    domain:
+      - [timesheet_invoice_id, "=", false]
+
+charts:
+  - key: kpi_margin
+    type: kpi
+    metric: finance.project_margin
+    label: Project Margin
+    layout: {x: 0, y: 0, w: 3, h: 2}
+
+  - key: kpi_hours
+    type: kpi
+    metric: finance.project_hours
+    label: Billable Hours
+    layout: {x: 3, y: 0, w: 3, h: 2}
+
+  - key: kpi_wip
+    type: kpi
+    metric: finance.wip_unbilled
+    label: WIP Unbilled
+    layout: {x: 6, y: 0, w: 3, h: 2}
+
+  - key: kpi_revenue
+    type: kpi
+    metric: finance.project_revenue
+    label: Project Revenue
+    layout: {x: 9, y: 0, w: 3, h: 2}
+
+  - key: chart_margin_trend
+    type: stackedcolumn_chart
+    metric: finance.project_revenue
+    label: Revenue vs Cost by Month
+    layout: {x: 0, y: 2, w: 6, h: 4}
+    config:
+      group_by: date:month
+
+  - key: chart_wip
+    type: table
+    metric: finance.wip_unbilled
+    label: WIP Details
+    layout: {x: 6, y: 2, w: 6, h: 4}
+
+layout:
+  - chartId: kpi_margin
+    x: 0
+    y: 0
+    w: 3
+    h: 2
+  - chartId: kpi_hours
+    x: 3
+    y: 0
+    w: 3
+    h: 2
+  - chartId: kpi_wip
+    x: 6
+    y: 0
+    w: 3
+    h: 2
+  - chartId: kpi_revenue
+    x: 9
+    y: 0
+    w: 3
+    h: 2
+  - chartId: chart_margin_trend
+    x: 0
+    y: 2
+    w: 6
+    h: 4
+  - chartId: chart_wip
+    x: 6
+    y: 2
+    w: 6
+    h: 4
