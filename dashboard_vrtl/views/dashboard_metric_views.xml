@@ -29,16 +29,16 @@
                                 </group>
                                 <group string="State">
                                     <field name="state_field"/>
-                                    <field name="state_colors" widget="ace" options="{'mode': 'json'}"/>
-                                    <field name="state_icons" widget="ace" options="{'mode': 'json'}"/>
+                                    <field name="state_colors" widget="ace" options="{'mode': 'javascript'}"/>
+                                    <field name="state_icons" widget="ace" options="{'mode': 'javascript'}"/>
                                 </group>
                             </group>
                             <group string="Card Fields">
-                                <field name="card_body_fields" widget="ace" options="{'mode': 'json'}"/>
-                                <field name="card_footer_fields" widget="ace" options="{'mode': 'json'}"/>
+                                <field name="card_body_fields" widget="ace" options="{'mode': 'javascript'}"/>
+                                <field name="card_footer_fields" widget="ace" options="{'mode': 'javascript'}"/>
                             </group>
                             <group string="Actions &amp; Grouping">
-                                <field name="card_actions" widget="ace" options="{'mode': 'json'}"/>
+                                <field name="card_actions" widget="ace" options="{'mode': 'javascript'}"/>
                                 <field name="kanban_group_field"/>
                             </group>
                         </page>
@@ -50,7 +50,7 @@
                                 <field name="default_domain" widget="domain"/>
                             </group>
                             <group invisible="source_type != 'sql'">
-                                <field name="sql_query" widget="ace" options="{'mode': 'sql'}"/>
+                                <field name="sql_query" widget="ace" options="{'mode': 'python'}"/>
                             </group>
                             <group invisible="source_type != 'service'">
                                 <field name="service_model"/>
