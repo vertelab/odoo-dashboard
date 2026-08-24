@@ -34,7 +34,6 @@
             "dashboard_vrtl/static/src/lib/amcharts/hierarchy.js",
             "dashboard_vrtl/static/src/lib/amcharts/map.js",
             "dashboard_vrtl/static/src/lib/amcharts/worldLow.js",
-            "dashboard_vrtl/static/src/lib/amcharts/bundle.js",
             "dashboard_vrtl/static/src/lib/amcharts/exporting.js",
             "dashboard_vrtl/static/src/lib/themes/themes.js",
             "dashboard_vrtl/static/src/lib/gridstack/gridstack.min.css",
