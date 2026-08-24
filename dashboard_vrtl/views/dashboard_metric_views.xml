@@ -66,7 +66,7 @@
                                 <field name="respects_ir_rule"/>
                                 <field name="row_level_security"/>
                                 <field name="safe_for_shared_cache"/>
-                                <field name="ir_rule_check_result" widget="json"/>
+                                <field name="ir_rule_check_result" widget="jsonb"/>
                             </group>
                         </page>
                     </notebook>

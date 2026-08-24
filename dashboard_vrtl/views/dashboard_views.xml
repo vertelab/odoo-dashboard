@@ -14,7 +14,7 @@
                         <group>
                             <field name="key"/>
                             <field name="category"/>
-                            <field name="icon" widget="fa_icon"/>
+                            <field name="icon"/>
                             <field name="description"/>
                         </group>
                         <group>
@@ -69,11 +69,7 @@
                         </page>
                     </notebook>
                 </sheet>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids"/>
-                    <field name="activity_ids"/>
-                    <field name="message_ids"/>
-                </div>
+                <chatter/>
             </form>
         </field>
     </record>

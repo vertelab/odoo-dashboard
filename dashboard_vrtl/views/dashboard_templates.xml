@@ -2,7 +2,12 @@
 <odoo>
     <!-- Main dashboard rendering template -->
     <template id="DashboardAmcharts" name="Dashboard AmCharts View">
-        <div t-name="dashboard_vrtl.DashboardAmcharts" class="o_dashboard_vrtl">
+        <div t-name="dashboard_vrtl.DashboardAmcharts" class="o_dashboard_vrtl" t-ref="root">
+            <!-- Loading -->
+            <div t-if="state.loading" class="o_dashboard_loading d-flex justify-content-center p-5">
+                <i class="fa fa-spinner fa-spin fa-2x text-muted"/>
+            </div>
+
             <!-- Filter bar -->
             <div class="o_dashboard_filters" t-if="state.filters and state.filters.length">
                 <t t-foreach="state.filters" t-as="filter" t-key="filter.key">
@@ -34,45 +39,17 @@
             </div>
 
             <!-- Chart grid -->
-            <div class="grid-stack"/>
-        </div>
-    </template>
-
-    <!-- Chart wrapper template -->
-    <template id="DashboardChartWrapper" name="Chart Wrapper">
-        <div t-name="dashboard_vrtl.DashboardChartWrapper" class="o_dashboard_chart_wrapper">
-            <div class="o_chart_header">
-                <h5 t-esc="props.chart.name"/>
-                <span class="o_chart_actions" t-if="props.editable">
-                    <i class="fa fa-cog" t-on-click="() => this.editChart(props.chart.id)"/>
-                </span>
-            </div>
-            <div class="o_chart_body" t-att-class="'o_chart_' + props.chart.chart_type">
-                <t t-if="props.chart.data and !props.chart.data.error">
-                    <t t-call="dashboard_vrtl.ChartComponent"/>
-                </t>
-                <t t-else="">
-                    <div class="o_chart_error alert alert-warning">
-                        <t t-esc="props.chart.data.message or 'No data to display'"/>
+            <div class="grid-stack" t-att-class="state.charts and state.charts.length ? '' : 'o_dashboard_empty'">
+                <t t-foreach="state.charts" t-as="chart" t-key="chart.id">
+                    <div class="grid-stack-item"
+                         t-att-gs-x="chart.x" t-att-gs-y="chart.y"
+                         t-att-gs-w="chart.w" t-att-gs-h="chart.h">
+                        <div class="grid-stack-item-content">
+                            <DashboardChartItem chart="chart" editable="state.editable"/>
+                        </div>
                     </div>
                 </t>
             </div>
-        </div>
-    </template>
-
-    <!-- Dynamic chart component dispatch -->
-    <template id="ChartComponent" name="Chart Component Dispatcher">
-        <div t-name="dashboard_vrtl.ChartComponent">
-            <BarChart t-if="props.chart.chart_type === 'bar_chart'" chartId="props.chart.id"
-                      name="props.chart.name" theme="props.chart.theme" recordSets="props.chart.data"/>
-            <LineChart t-if="props.chart.chart_type === 'line_chart'" chartId="props.chart.id"
-                       name="props.chart.name" theme="props.chart.theme" recordSets="props.chart.data"/>
-            <PieChart t-if="props.chart.chart_type === 'pie_chart'" chartId="props.chart.id"
-                      name="props.chart.name" theme="props.chart.theme" recordSets="props.chart.data"/>
-            <KPIView t-if="props.chart.chart_type === 'kpi'" chartId="props.chart.id"
-                     name="props.chart.name" theme="props.chart.theme" recordSets="props.chart.data"/>
-            <KanbanView t-if="props.chart.chart_type === 'kanban'" chartId="props.chart.id"
-                        name="props.chart.name" theme="props.chart.theme" recordSets="props.chart.data"/>
         </div>
     </template>
 </odoo>

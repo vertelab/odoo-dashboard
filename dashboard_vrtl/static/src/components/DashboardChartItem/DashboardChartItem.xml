@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="dashboard_vrtl.DashboardChartItem">
+        <div class="o_dashboard_chart_wrapper h-100 d-flex flex-column">
+            <div class="o_chart_header d-flex justify-content-between align-items-center px-2 py-1">
+                <h5 class="m-0" t-esc="props.chart.name"/>
+                <span class="o_chart_actions" t-if="props.editable">
+                    <i class="fa fa-cog text-muted"/>
+                </span>
+            </div>
+            <div class="o_chart_body flex-grow-1" t-att-class="'o_chart_' + props.chart.chart_type">
+                <t t-if="props.chart.data and props.chart.data.type === 'error'">
+                    <div class="o_chart_error alert alert-warning m-2">
+                        <t t-esc="props.chart.data.message or 'No data to display'"/>
+                    </div>
+                </t>
+                <t t-elif="hasData">
+                    <t t-if="props.chart.chart_type === 'bar_chart'">
+                        <BarChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                    </t>
+                    <t t-elif="props.chart.chart_type === 'column_chart'">
+                        <ColumnChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                    </t>
+                    <t t-elif="props.chart.chart_type === 'line_chart'">
+                        <LineChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                    </t>
+                    <t t-elif="props.chart.chart_type === 'area_chart'">
+                        <AreaChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                    </t>
+                    <t t-elif="props.chart.chart_type === 'doughnut_chart'">
+                        <DoughnutChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                    </t>
+                    <t t-elif="props.chart.chart_type === 'funnel_chart'">
+                        <FunnelChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                    </t>
+                    <t t-elif="props.chart.chart_type === 'pyramid_chart'">
+                        <PyramidChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                    </t>
+                    <t t-elif="props.chart.chart_type === 'radar_chart'">
+                        <RadarChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                    </t>
+                    <t t-elif="props.chart.chart_type === 'radial_chart'">
+                        <RadialChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                    </t>
+                    <t t-elif="props.chart.chart_type === 'scatter_chart'">
+                        <ScatterChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                    </t>
+                    <t t-elif="props.chart.chart_type === 'stackedcolumn_chart'">
+                        <StackedColumnChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                    </t>
+                    <t t-elif="props.chart.chart_type === 'map_chart'">
+                        <MapChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                    </t>
+                    <t t-elif="props.chart.chart_type === 'meter_chart'">
+                        <MeterChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                    </t>
+                    <t t-elif="props.chart.chart_type === 'kpi'">
+                        <KPIView chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                    </t>
+                    <t t-elif="props.chart.chart_type === 'tile'">
+                        <TileView chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                    </t>
+                    <t t-elif="props.chart.chart_type === 'to_do'">
+                        <TodoView chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                    </t>
+                    <t t-elif="props.chart.chart_type === 'list' or props.chart.chart_type === 'table'">
+                        <ListView chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                    </t>
+                    <t t-elif="props.chart.chart_type === 'kanban'">
+                        <KanbanView chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                    </t>
+                    <t t-else="">
+                        <div class="o_chart_error alert alert-info m-2">
+                            Chart type "<t t-esc="props.chart.chart_type"/>" is not implemented
+                        </div>
+                    </t>
+                </t>
+                <div t-else="" class="o_chart_error alert alert-warning m-2">
+                    No data to display
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

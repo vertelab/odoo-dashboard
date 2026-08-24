@@ -299,6 +299,7 @@ class DashboardDashboard(models.Model):
         metric = chart.metric_id
         if not metric:
             return {}
+        drill_model = self._get_drill_model(metric)
         return {
             "state_field": metric.state_field,
             "state_colors": metric.state_colors or "{}",
@@ -311,9 +312,25 @@ class DashboardDashboard(models.Model):
             "kanban_group_field": metric.kanban_group_field,
             "kanban_draggable": metric.kanban_draggable,
             "kanban_drag_group_field": metric.kanban_drag_group_field,
-            "_drill_model": metric.model_id.model if metric.source_type == "model" else "",
-            "_res_model": metric.model_id.model if metric.source_type == "model" else "",
+            "_drill_model": drill_model,
+            "_res_model": drill_model,
         }
+
+    def _get_drill_model(self, metric):
+        """Resolve the drill-down model for a metric.
+
+        - model sources: the bound Odoo model
+        - service sources: the source schema's drill_model (if declared)
+        """
+        if metric.source_type == "model" and metric.model_id:
+            return metric.model_id.model
+        if metric.source_type == "service" and metric.service_model:
+            try:
+                schema = self.env[metric.service_model].get_schema()
+                return schema.get("drill_model", "")
+            except Exception:
+                return ""
+        return ""
 
     @api.model
     def validate_all(self):

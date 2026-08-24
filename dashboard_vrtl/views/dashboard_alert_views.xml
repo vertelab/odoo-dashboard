@@ -24,17 +24,13 @@
                         </group>
                     </group>
                     <group string="Notification Channels">
-                        <field name="channels" widget="many2many_tags"/>
+                        <field name="channels" widget="jsonb"/>
                     </group>
                     <group string="Recipients">
-                        <field name="recipients" widget="json"/>
+                        <field name="recipients" widget="jsonb"/>
                     </group>
                 </sheet>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids"/>
-                    <field name="activity_ids"/>
-                    <field name="message_ids"/>
-                </div>
+                <chatter/>
             </form>
         </field>
     </record>

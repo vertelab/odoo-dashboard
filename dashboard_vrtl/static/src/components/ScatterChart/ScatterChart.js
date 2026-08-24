@@ -78,8 +78,9 @@ export class ScatterChart extends Component {
       if (!["category", "record_id", "isSubGroupBy"].includes(key)) {
         let parts = key.split(" - ");
         companies.add(parts[0]);
-        if (!valueTypes.includes(parts[1])) {
-          valueTypes.push(parts[1]);
+        const valueType = parts.length > 1 ? parts[1] : "";
+        if (!valueTypes.includes(valueType)) {
+          valueTypes.push(valueType);
         }
       }
     });
@@ -92,9 +93,9 @@ export class ScatterChart extends Component {
       };
       companies.forEach((company) => {
         valueTypes.forEach((type) => {
-          const key = `${company} - ${type}`;
-          if (item[key] != null) {
-            obj[`${company}_${type}`] = item[key];
+          const sourceKey = type ? `${company} - ${type}` : company;
+          if (item[sourceKey] != null) {
+            obj[`${company}_${type || "value"}`] = item[sourceKey];
           }
         });
       });
@@ -106,7 +107,7 @@ export class ScatterChart extends Component {
       category: "0",
       ...Object.fromEntries(
         companies.flatMap((company) =>
-          valueTypes.map((type) => [`${company}_${type}`, 0]),
+          valueTypes.map((type) => [`${company}_${type || "value"}`, 0]),
         ),
       ),
     });
@@ -155,16 +156,16 @@ export class ScatterChart extends Component {
     var self = this;
     companies.forEach((company) => {
       valueTypes.forEach((type, i) => {
-        const field = `${company}_${type}`;
+        const field = `${company}_${type || "value"}`;
         const series = chart.series.push(
           am5xy.LineSeries.new(self.root, {
-            name: `${company} (${type})`,
+            name: type ? `${company} (${type})` : company,
             xAxis: xAxis,
             yAxis: yAxis,
             categoryXField: "category",
             valueYField: field,
             tooltip: am5.Tooltip.new(self.root, {
-              labelText: "{category}\n" + `${company} (${type}): {valueY}`,
+              labelText: "{category}\n" + `${company} (${type || "value"}): {valueY}`,
             }),
           }),
         );

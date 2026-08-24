@@ -17,7 +17,7 @@
                     <group invisible="filter_type != 'date_range'">
                         <field name="default_from"/>
                         <field name="default_to"/>
-                        <field name="shortcuts" widget="json"/>
+                        <field name="shortcuts" widget="jsonb"/>
                     </group>
                     <group invisible="filter_type != 'many2one'">
                         <field name="model"/>

@@ -3,11 +3,13 @@
 import { Component, onWillStart, onMounted, onWillUnmount, useState, useRef } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { useService } from "@web/core/utils/hooks";
-import { loadJS } from "@web/core/assets";
+import { standardActionServiceProps } from "@web/webclient/actions/action_service";
+import { DashboardChartItem } from "../components/DashboardChartItem/DashboardChartItem";
 
 export class DashboardVrtlAmcharts extends Component {
     static template = "dashboard_vrtl.DashboardAmcharts";
-    static props = { "*": true };
+    static components = { DashboardChartItem };
+    static props = { ...standardActionServiceProps };
 
     setup() {
         this.orm = useService("orm");
@@ -55,13 +57,12 @@ export class DashboardVrtlAmcharts extends Component {
     async loadDashboard() {
         this.state.loading = true;
         try {
-            const [duration, charts, name, editable] = await this.orm.call(
+            const [duration, charts, name] = await this.orm.call(
                 "dashboard.dashboard", "get_charts_details",
                 [this.props.action.params.record]
             );
             this.state.charts = charts || [];
             this.state.name = name || "";
-            this.state.editable = editable;
             this.autoReloadDuration = duration || 300000;
         } catch (e) {
             console.error("Failed to load dashboard:", e);

@@ -58,7 +58,7 @@
                         <page string="Drill-Down">
                             <group>
                                 <field name="drill_enabled"/>
-                                <field name="drill_path" widget="json"/>
+                                <field name="drill_path" widget="jsonb"/>
                             </group>
                         </page>
                     </notebook>

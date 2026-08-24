@@ -83,7 +83,9 @@ export class LineChart extends Component {
     let companies = new Set();
     Object.keys(rawData[0]).forEach((key) => {
       if (key !== "category" && key !== "record_id" && key !== "isSubGroupBy") {
-        let [company, valueType] = key.split(" - ");
+        let parts = key.split(" - ");
+        let company = parts[0];
+        let valueType = parts.length > 1 ? parts[1] : "";
         companies.add(company);
         if (!valueTypes.includes(valueType)) {
           valueTypes.push(valueType);
@@ -96,9 +98,9 @@ export class LineChart extends Component {
       let newItem = { category: item.category };
       companies.forEach((company) => {
         valueTypes.forEach((type) => {
-          let key = `${company} - ${type}`;
-          if (item[key] != null) {
-            newItem[`${company}_${type}`] = item[key];
+          const sourceKey = type ? `${company} - ${type}` : company;
+          if (item[sourceKey] != null) {
+            newItem[`${company}_${type || "value"}`] = item[sourceKey];
           }
         });
       });
@@ -109,7 +111,7 @@ export class LineChart extends Component {
       category: "0",
       ...Object.fromEntries(
         companies.flatMap((company) =>
-          valueTypes.map((type) => [`${company}_${type}`, 0]),
+          valueTypes.map((type) => [`${company}_${type || "value"}`, 0]),
         ),
       ),
     });
@@ -228,9 +230,9 @@ export class LineChart extends Component {
     // Create series for each company + value type
     companies.forEach((company) => {
       valueTypes.forEach((type) => {
-        const field = `${company}_${type}`;
+        const field = `${company}_${type || "value"}`;
         if (data[0][field] !== undefined) {
-          createSeries(`${company} (${type})`, field);
+          createSeries(type ? `${company} (${type})` : company, field);
         }
       });
     });
