@@ -9,6 +9,7 @@ from . import (
     dashboard_filter,
     dashboard_alert,
     dashboard_cache,
+    dashboard_mail,
     dashboard_taxonomy_concept,
     dashboard_yaml,
 )

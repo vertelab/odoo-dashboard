@@ -308,3 +308,49 @@ Modulen `dashboard_vrtl_finance` levererar 7 rollbaserade dashboards:
 4. **Compensation transparency** — Contract data isolated → salary distribution by department
 5. **Cross-chart interactivity** — clicking a department filters all charts
 6. **Alerting** — automatic notification when sick rate exceeds threshold
+
+## Demo-data (dashboard_vrtl_demo)
+
+Installera `dashboard_vrtl_demo` (demo=True) i en databas skapad med demo-data för att få
+8 färdiga dashboards under BI Dashboard-menyn. Alla demo-metrics är `source_type=model`
+och aggregerar Odoos egna demo-records (base/sale/account/crm/project) — modulen skapar
+inga egna business-records.
+
+- `demo_contacts` — res.partner (pie/bar/map/table, filter: date_range/many2one/companies)
+- `demo_users_access` — res.users/res.company
+- `demo_communication` — mail.channel/mail.message tidsserie
+- `demo_sales` — sale.order (KPI med previous-period-jämförelse, top-produkter, drill)
+- `demo_finance` — account.move(.line) (inkl. `today_approx`-sentinel för förfallna fakturor)
+- `demo_crm` — crm.lead (funnel per steg)
+- `demo_projects` — project.task
+- `demo_gallery` — en chart av varje implementerad typ, kanban med drag-and-drop,
+  KPI med comparison+target, alert, cross-chart-filter, e-postschema
+
+### Kanban på model-source
+
+Kanban-charts fungerar direkt på model-source: `metric.get_data({"format": "kanban"})`
+returnerar `rows`/`columns` byggda från metric:ens kanban-konfiguration
+(state_field/colors/icons, card_title/subtitle/body/footer, group_field, draggable).
+`kanban_group_field` styr kolumnerna; drag-and-drop skriver `kanban_drag_group_field`
+direkt på modellen (`orm.write`). Service-källorna (t.ex. account.journals) returnerar
+samma format via sin `get_data`.
+
+### KPI-jämförelse och target
+
+- `chart.previous_period_comparison` + `previous_period_type` (percentage/value): backend
+  beräknar föregående period genom att skifta den aktiva datum-window:en bakåt (kräver
+  datumwindow: chart date_filter_option eller globalt period-filter).
+- `chart.kpi_target_value`: KPI:n visar progress mot mål (progress-bar); används även som
+  target för meter_chart.
+- YAML: `comparison: previous_period`, `comparison_type: percentage`,
+  `config: {target: 200000}`.
+
+### Schemalagd e-post (dashboard.mail)
+
+- Skapa ett `dashboard.mail`-schema (dashboard, charts, mottagare/grupper/användare,
+  intervall). Charts som ingår i ett aktivt schema fångas som PNG i klienten
+  (amCharts SVG→PNG, debounced) och lagras på `chart.image`.
+- Cron "Dashboard: Send Scheduled Emails" (var 15:e min) skickar `mail.mail` med
+  bilderna inbäddade (base64 inline + attachments), en gång per period.
+- SVG-renderade chart-typer får riktiga bilder; HTML-typer (kpi/tile/list/table/…) får
+  en kompakt HTML-sammanfattning som fallback.

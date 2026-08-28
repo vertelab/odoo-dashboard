@@ -81,7 +81,7 @@ charts:
     layout: {x: 3, y: 0, w: 2, h: 2}
 
   - key: chart_revenue_trend
-    type: line
+    type: line_chart
     metric: sales.net_revenue
     label: "Omsättning — trend"
     layout: {x: 0, y: 2, w: 6, h: 4}
@@ -89,7 +89,7 @@ charts:
       group_by: date_order:month
 
   - key: chart_top_products
-    type: bar
+    type: bar_chart
     metric: sales.top_products
     label: "Topp 5 produkter"
     layout: {x: 0, y: 6, w: 4, h: 4}

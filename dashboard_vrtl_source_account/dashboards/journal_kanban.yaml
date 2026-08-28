@@ -75,7 +75,7 @@ metrics:
 filters:
   - key: company
     label: Company
-    type: company
+    type: companies
     default: current_company
 
 charts:

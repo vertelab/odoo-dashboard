@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Demo dashboards are loaded as YAML (dashboard-as-code) and hang under
+         the BI Dashboard menu created by dashboard_vrtl. All metrics are
+         source_type=model and aggregate Odoo's own demo records. -->
+    <function model="dashboard.dashboard"
+              name="load_from_module_yaml"
+              eval="['dashboard_vrtl_demo', 'data/dashboards/contacts.yaml']"/>
+
+    <function model="dashboard.dashboard"
+              name="load_from_module_yaml"
+              eval="['dashboard_vrtl_demo', 'data/dashboards/users_access.yaml']"/>
+
+    <function model="dashboard.dashboard"
+              name="load_from_module_yaml"
+              eval="['dashboard_vrtl_demo', 'data/dashboards/communication.yaml']"/>
+
+    <function model="dashboard.dashboard"
+              name="load_from_module_yaml"
+              eval="['dashboard_vrtl_demo', 'data/dashboards/sales.yaml']"/>
+
+    <function model="dashboard.dashboard"
+              name="load_from_module_yaml"
+              eval="['dashboard_vrtl_demo', 'data/dashboards/finance.yaml']"/>
+
+    <function model="dashboard.dashboard"
+              name="load_from_module_yaml"
+              eval="['dashboard_vrtl_demo', 'data/dashboards/crm.yaml']"/>
+
+    <function model="dashboard.dashboard"
+              name="load_from_module_yaml"
+              eval="['dashboard_vrtl_demo', 'data/dashboards/projects.yaml']"/>
+
+    <function model="dashboard.dashboard"
+              name="load_from_module_yaml"
+              eval="['dashboard_vrtl_demo', 'data/dashboards/demo_gallery.yaml']"/>
+
+    <!-- Demo scheduled email on the gallery (recipients: demo user) -->
+    <function model="dashboard.mail"
+              name="_demo_create_schedule"
+              eval="['demo_gallery', 'Demo Weekly Gallery', ['gal_kpi_revenue', 'gal_line_revenue', 'gal_pie_country', 'gal_bar_country']]"/>
+</odoo>

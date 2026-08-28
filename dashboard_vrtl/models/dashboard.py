@@ -8,6 +8,7 @@ import yaml
 
 from odoo import _, api, fields, models
 from odoo.exceptions import ValidationError
+from odoo.http import request
 from odoo.modules import get_module_path
 
 
@@ -38,7 +39,8 @@ class DashboardDashboard(models.Model):
     grid_stack_dimensions = fields.Json(default=[], copy=False)
     auto_reload_duration = fields.Selection(
         [("15000", "15 Seconds"), ("30000", "30 Seconds"), ("60000", "1 Minute"),
-         ("120000", "2 Minutes"), ("300000", "5 Minutes"), ("900000", "15 Minutes")],
+         ("120000", "2 Minutes"), ("300000", "5 Minutes"), ("900000", "15 Minutes"),
+         ("1800000", "30 Minutes"), ("3600000", "1 Hour")],
         default="300000",
     )
     cache_ttl = fields.Integer(
@@ -158,6 +160,14 @@ class DashboardDashboard(models.Model):
         return d
 
     def _yaml_to_dashboard_vals(self, data):
+        parent_menu_id = False
+        parent_menu = data.get("parent_menu")
+        if parent_menu:
+            if "." in parent_menu:
+                menu = self.env.ref(parent_menu, raise_if_not_found=False)
+            else:
+                menu = self.env["ir.ui.menu"].search([("name", "=", parent_menu)], limit=1)
+            parent_menu_id = menu.id if menu else False
         return {
             "key": data["key"], "name": data.get("name", data["key"]),
             "icon": data.get("icon", "fa-chart-line"),
@@ -165,6 +175,8 @@ class DashboardDashboard(models.Model):
             "auto_reload_duration": str(data.get("auto_refresh", 300000)),
             "cache_ttl": data.get("cache_ttl", 300),
             "menu_mode": data.get("menu_mode", "submenu"),
+            "parent_menu_id": parent_menu_id,
+            "menu_sequence": data.get("menu_sequence", 1),
         }
 
     def _load_filter_from_yaml(self, dashboard, data):
@@ -180,7 +192,37 @@ class DashboardDashboard(models.Model):
         self.env["dashboard.alert"].load_from_yaml(dashboard, data)
 
     def _apply_grid_layout(self, layout_data):
-        self.grid_stack_dimensions = layout_data
+        """Persist a grid layout, resolving string chart keys to chart ids.
+
+        YAML layouts reference charts by their string ``key`` (e.g. ``chartId:
+        kpi_revenue``) while the frontend and ``get_charts_details()`` work with
+        int chart ids. Resolving at load time makes the declared layout apply
+        from the first render.
+        """
+        layout = layout_data or []
+        key_to_id = {c.key: c.id for c in self.chart_ids if c.key}
+        resolved = []
+        for entry in layout:
+            chart_id = entry.get("chartId")
+            if isinstance(chart_id, str) and chart_id in key_to_id:
+                entry = {**entry, "chartId": key_to_id[chart_id]}
+            resolved.append(entry)
+        self.grid_stack_dimensions = resolved
+
+    def _normalize_grid(self, grid):
+        """Return a copy of ``grid`` with string chart keys resolved to int ids.
+
+        Heals layouts stored before key-resolution existed (legacy YAML loads)
+        without mutating the stored field.
+        """
+        key_to_id = {c.key: c.id for c in self.chart_ids if c.key}
+        normalized = []
+        for entry in grid:
+            chart_id = entry.get("chartId")
+            if isinstance(chart_id, str) and chart_id in key_to_id:
+                entry = {**entry, "chartId": key_to_id[chart_id]}
+            normalized.append(entry)
+        return normalized
 
     # ──────────────────────────────────────────────────────────────
     # Menu Management
@@ -239,6 +281,37 @@ class DashboardDashboard(models.Model):
             if rec.created_action_id:
                 rec.created_action_id.unlink()
 
+    def action_open_dashboard(self):
+        """Open this dashboard in the BI (amcharts) view."""
+        self.ensure_one()
+        return {
+            "type": "ir.actions.client",
+            "tag": "dashboard_vrtl_amcharts",
+            "params": {"record": self.id, "dashboard_name": self.name},
+            "target": "current",
+        }
+
+    def action_save_layout(self, layout):
+        """Persist the grid layout from the edit mode.
+
+        ``layout`` is a list of ``{"chartId": int, "x": int, "y": int,
+        "w": int, "h": int}`` dicts as returned by GridStack.save().
+        """
+        self.ensure_one()
+        self.write({"grid_stack_dimensions": layout or []})
+        return True
+
+    def action_set_brand_context(self, brand_id):
+        """Set the focused brand in the session (brand context).
+
+        Brand-aware models (via ``social.brand.focus.mixin``) then scope all
+        their data to the selected brand — the same pattern the brand kanban
+        root uses. Pass 0/False to clear the brand context.
+        """
+        self.ensure_one()
+        request.session["social_brand_id"] = brand_id or False
+        return True
+
     def unlink(self):
         # Restore original menu actions before deleting dashboards
         for rec in self:
@@ -250,11 +323,21 @@ class DashboardDashboard(models.Model):
     # Chart Data Retrieval
     # ──────────────────────────────────────────────────────────────
 
-    def get_charts_details(self):
-        """Return chart data and positioning for dashboard rendering."""
+    def get_charts_details(self, filters=None):
+        """Return chart data, positioning and filter definitions for rendering.
+
+        ``filters`` is an optional dict with:
+        - ``global``: values of the dashboard's global filters (date range, etc.)
+        - ``cross``: cross-chart / drill-down filters emitted by other charts
+        """
         self.check_access("read")
+        filters = filters or {}
+        global_filters = filters.get("global", {}) or {}
+        cross_filters = filters.get("cross", {}) or {}
         charts = []
-        grid = self.grid_stack_dimensions or []
+        # Work on a copy: the stored layout must never be mutated in place
+        # (repeated renders would otherwise append duplicate positions).
+        grid = self._normalize_grid(list(self.grid_stack_dimensions or []))
         existing_ids = {g["chartId"] for g in grid}
 
         for chart in self.chart_ids:
@@ -265,10 +348,18 @@ class DashboardDashboard(models.Model):
             else:
                 pos = next(g for g in grid if g["chartId"] == chart.id)
 
-            data, from_cache = self.env["dashboard.cache"].get_or_compute(
-                chart.metric_id, self.env.user, chart._get_active_filters(),
-                ttl=self.cache_ttl,
+            active_filters = chart._get_active_filters(
+                global_filters=global_filters,
+                cross_filters=cross_filters,
             )
+            try:
+                data, from_cache = self.env["dashboard.cache"].get_or_compute(
+                    chart.metric_id, self.env.user, active_filters,
+                    ttl=self.cache_ttl,
+                )
+            except Exception as exc:
+                # One failing chart must not break the whole dashboard
+                data = {"type": "error", "message": str(exc)}
             # Embed kanban config into data for KanbanView component
             chart_kanban_config = self._get_kanban_config(chart) if chart.chart_type == "kanban" else {}
             if chart_kanban_config and isinstance(data, dict) and data.get("type") != "error":
@@ -279,11 +370,14 @@ class DashboardDashboard(models.Model):
                 "chart_type": chart.chart_type, "theme": chart.theme or "material",
                 "data": data,
                 "background_color": chart.background_color,
+                "kpi_target_value": chart.kpi_target_value,
+                "group_by_field": chart.filter_field or (chart.group_by_id.name if chart.group_by_id else False),
                 "x": pos.get("x", 0), "y": pos.get("y", 0),
                 "w": pos.get("w", 6), "h": pos.get("h", 4),
             })
 
-        return [int(self.auto_reload_duration), charts, self.name]
+        filter_defs = [f._filter_to_dict() for f in self.filter_ids]
+        return [int(self.auto_reload_duration), charts, self.name, filter_defs]
 
     def _find_next_position(self, items, width, columns=12):
         if not items:
@@ -346,13 +440,15 @@ class DashboardDashboard(models.Model):
                     issues.append(f"[{dashboard.key}] Chart '{chart.name}': {e}")
         return issues
 
+    def get_mail_capture_chart_ids(self):
+        """Chart ids referenced by active mail schedules (PNG capture targets).
 
-class DashboardMail(models.Model):
-    _name = "dashboard.mail"
-    _description = "Dashboard Mail Schedule"
-
-    dashboard_id = fields.Many2one("dashboard.dashboard", required=True, ondelete="cascade")
-    name = fields.Char(required=True)
-    chart_ids = fields.Many2many("dashboard.chart")
-    recipient_ids = fields.Many2many("res.partner", required=True)
-    is_automated = fields.Boolean()
+        The frontend exports these charts to PNG (amCharts) and stores them on
+        ``dashboard.chart.image`` so the email cron can embed real images.
+        """
+        self.ensure_one()
+        mails = self.dashboard_mail_ids.filtered(lambda m: m.is_automated and m.active)
+        chart_ids = set()
+        for mail in mails:
+            chart_ids.update(mail.chart_ids.ids)
+        return sorted(chart_ids)

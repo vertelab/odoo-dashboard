@@ -1,0 +1,126 @@
+dashboard:
+  key: demo_crm
+  name: Demo — CRM Pipeline
+  name_sv: Demo — CRM-pipeline
+  description: CRM-pipeline baserad på crm-demo-data (crm.lead).
+  icon: fa-filter
+  category: Demo
+  parent_menu: dashboard_vrtl.parent_dashboard_menu
+  menu_sequence: 110
+  auto_refresh: 300000
+  cache_ttl: 300
+
+filters:
+  - key: period
+    type: date_range
+    label: Slutdatum
+    default:
+      from: this_year_start
+      to: today
+  - key: team
+    type: many2one
+    label: Säljteam
+    model: crm.team
+    field: team_id
+
+metrics:
+  - key: demo.crm.pipeline
+    label: Pipeline-värde
+    source_type: model
+    model: crm.lead
+    field: expected_revenue
+    aggregation: sum
+    unit: monetary
+    date_field: date_deadline
+    domain:
+      - [probability, ">", 0]
+      - [probability, "<", 100]
+
+  - key: demo.crm.deals
+    label: Antal leads
+    source_type: model
+    model: crm.lead
+    field: id
+    aggregation: count
+    unit: integer
+    date_field: date_deadline
+    domain:
+      - [probability, ">", 0]
+      - [probability, "<", 100]
+
+  - key: demo.crm.by_stage
+    label: Leads per steg
+    source_type: model
+    model: crm.lead
+    field: id
+    aggregation: count
+    unit: integer
+    date_field: date_deadline
+    domain:
+      - [probability, ">", 0]
+
+  - key: demo.crm.by_team
+    label: Pipeline per team
+    source_type: model
+    model: crm.lead
+    field: expected_revenue
+    aggregation: sum
+    unit: monetary
+    date_field: date_deadline
+    domain:
+      - [probability, ">", 0]
+      - [probability, "<", 100]
+
+charts:
+  - key: kpi_pipeline
+    type: kpi
+    metric: demo.crm.pipeline
+    label: Pipeline
+    layout: {x: 0, y: 0, w: 2, h: 2}
+
+  - key: kpi_deals
+    type: kpi
+    metric: demo.crm.deals
+    label: Leads
+    layout: {x: 2, y: 0, w: 2, h: 2}
+
+  - key: chart_by_stage
+    type: funnel_chart
+    metric: demo.crm.by_stage
+    label: Pipeline per steg
+    layout: {x: 4, y: 0, w: 4, h: 4}
+    config:
+      group_by: stage_id
+      sort: desc
+      limit: 6
+
+  - key: chart_by_team
+    type: bar_chart
+    metric: demo.crm.by_team
+    label: Pipeline per team
+    layout: {x: 8, y: 0, w: 4, h: 4}
+    config:
+      group_by: team_id
+      sort: desc
+
+layout:
+  - chartId: kpi_pipeline
+    x: 0
+    y: 0
+    w: 2
+    h: 2
+  - chartId: kpi_deals
+    x: 2
+    y: 0
+    w: 2
+    h: 2
+  - chartId: chart_by_stage
+    x: 4
+    y: 0
+    w: 4
+    h: 4
+  - chartId: chart_by_team
+    x: 8
+    y: 0
+    w: 4
+    h: 4

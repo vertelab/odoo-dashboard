@@ -110,11 +110,19 @@ class DashboardAlert(models.Model):
                 self._notify_activity(value, context)
 
     def _notify_discuss(self, value, context):
-        channel = self.env["mail.channel"].search([("name", "=", "Dashboard Alerts")], limit=1)
+        # Odoo 18: the Discuss channel model is ``discuss.channel`` (previously
+        # ``mail.channel``). Support both so alerts work on older builds too.
+        if "discuss.channel" in self.env.registry:
+            ChannelModel = self.env["discuss.channel"]
+        elif "mail.channel" in self.env.registry:
+            ChannelModel = self.env["mail.channel"]
+        else:
+            return
+        channel = ChannelModel.search([("name", "=", "Dashboard Alerts")], limit=1)
         if not channel:
-            channel = self.env["mail.channel"].create({
-                "name": "Dashboard Alerts", "public": "groups",
-                "group_ids": [(6, 0, [self.env.ref("dashboard_vrtl.group_dashboard_user").id])],
+            channel = ChannelModel.create({
+                "name": "Dashboard Alerts",
+                "group_public_id": self.env.ref("dashboard_vrtl.group_dashboard_user").id,
             })
         channel.message_post(
             body=f"⚠️ **{self.name}** ({self.severity.upper()})\n\n"

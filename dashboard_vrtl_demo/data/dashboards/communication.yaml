@@ -1,0 +1,101 @@
+dashboard:
+  key: demo_communication
+  name: Demo — Communication
+  name_sv: Demo — Kommunikation
+  description: Meddelande- och kanalöversikt (mail.channel, mail.message).
+  icon: fa-comments
+  category: Demo
+  parent_menu: dashboard_vrtl.parent_dashboard_menu
+  menu_sequence: 80
+  auto_refresh: 300000
+  cache_ttl: 300
+
+filters:
+  - key: period
+    type: date_range
+    label: Period
+    default:
+      from: last_30_days
+      to: today
+    shortcuts:
+      - label: Denna vecka
+        from: this_week
+        to: today
+      - label: Denna månad
+        from: this_month_start
+        to: today
+      - label: Senaste 90 dagarna
+        from: last_90_days
+        to: today
+
+metrics:
+  - key: demo.comm.messages
+    label: Meddelanden
+    source_type: model
+    model: mail.message
+    field: id
+    aggregation: count
+    unit: integer
+    date_field: date
+
+  - key: demo.comm.by_channel
+    label: Meddelanden per kanal
+    source_type: model
+    model: mail.message
+    field: id
+    aggregation: count
+    unit: integer
+    date_field: date
+    domain:
+      - [channel_id, "!=", false]
+
+  - key: demo.comm.by_day
+    label: Meddelanden per dag
+    source_type: model
+    model: mail.message
+    field: id
+    aggregation: count
+    unit: integer
+    date_field: date
+
+charts:
+  - key: kpi_messages
+    type: kpi
+    metric: demo.comm.messages
+    label: Meddelanden
+    layout: {x: 0, y: 0, w: 2, h: 2}
+
+  - key: chart_by_day
+    type: line_chart
+    metric: demo.comm.by_day
+    label: Meddelanden per dag
+    layout: {x: 2, y: 0, w: 6, h: 4}
+    config:
+      group_by: date:day
+
+  - key: chart_by_channel
+    type: bar_chart
+    metric: demo.comm.by_channel
+    label: Toppkanaler
+    layout: {x: 8, y: 0, w: 4, h: 4}
+    config:
+      group_by: channel_id
+      sort: desc
+      limit: 8
+
+layout:
+  - chartId: kpi_messages
+    x: 0
+    y: 0
+    w: 2
+    h: 2
+  - chartId: chart_by_day
+    x: 2
+    y: 0
+    w: 6
+    h: 4
+  - chartId: chart_by_channel
+    x: 8
+    y: 0
+    w: 4
+    h: 4

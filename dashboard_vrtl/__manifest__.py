@@ -22,7 +22,6 @@
         "views/dashboard_filter_views.xml",
         "views/dashboard_alert_views.xml",
         "views/dashboard_menus.xml",
-        "views/dashboard_templates.xml",
     ],
     "assets": {
         "web.assets_backend": [
@@ -37,8 +36,10 @@
             "dashboard_vrtl/static/src/lib/amcharts/exporting.js",
             "dashboard_vrtl/static/src/lib/themes/themes.js",
             "dashboard_vrtl/static/src/lib/gridstack/gridstack.min.css",
+            "dashboard_vrtl/static/src/lib/gridstack/gridstack-all.js",
             "dashboard_vrtl/static/src/js/*.js",
             "dashboard_vrtl/static/src/components/**/*",
+            "dashboard_vrtl/static/src/dashboard_templates.xml",
         ],
     },
     "installable": True,

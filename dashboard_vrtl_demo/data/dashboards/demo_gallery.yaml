@@ -1,0 +1,380 @@
+dashboard:
+  key: demo_gallery
+  name: Demo — Chart Gallery
+  name_sv: Demo — Diagramgalleri
+  description: Alla implementerade chart-typer, KPI-jämförelse med target, kanban med drag-and-drop, alert, drill-down och cross-chart-filter.
+  icon: fa-th-large
+  category: Demo
+  parent_menu: dashboard_vrtl.parent_dashboard_menu
+  menu_sequence: 130
+  auto_refresh: 300000
+  cache_ttl: 300
+
+filters:
+  - key: period
+    type: date_range
+    label: Period
+    default:
+      from: this_year_start
+      to: today
+
+metrics:
+  - key: demo.gallery.revenue
+    label: Omsättning
+    source_type: model
+    model: sale.order
+    field: amount_total
+    aggregation: sum
+    unit: monetary
+    date_field: date_order
+    domain:
+      - [state, not in, [draft, cancel, sent]]
+
+  - key: demo.gallery.orders
+    label: Ordrar
+    source_type: model
+    model: sale.order
+    field: id
+    aggregation: count
+    unit: integer
+    date_field: date_order
+    domain:
+      - [state, not in, [draft, cancel, sent]]
+
+  - key: demo.gallery.partners_by_country
+    label: Kontakter per land
+    source_type: model
+    model: res.partner
+    field: id
+    aggregation: count
+    unit: integer
+
+  - key: demo.gallery.partners_by_active
+    label: Kontakter per status
+    source_type: model
+    model: res.partner
+    field: id
+    aggregation: count
+    unit: integer
+
+  - key: demo.gallery.orders_by_state
+    label: Ordrar per status
+    source_type: model
+    model: sale.order
+    field: id
+    aggregation: count
+    unit: integer
+    date_field: date_order
+    domain:
+      - [state, not in, [cancel]]
+
+  - key: demo.gallery.draft_invoices
+    label: Utkastfakturor
+    source_type: model
+    model: account.move
+    field: id
+    aggregation: count
+    unit: integer
+    domain:
+      - [state, "=", draft]
+      - [move_type, in, [out_invoice, out_refund, in_invoice, in_refund]]
+
+  - key: demo.gallery.invoices_kanban
+    label: Fakturor (kanban)
+    source_type: model
+    model: account.move
+    field: id
+    aggregation: count
+    unit: monetary
+    domain:
+      - [state, in, [draft, posted]]
+    kanban:
+      state_field: state
+      state_colors:
+        draft: "#ffc107"
+        posted: "#28a745"
+        cancel: "#6c757d"
+      state_icons:
+        draft: fa-pencil
+        posted: fa-check-circle
+        cancel: fa-ban
+      card_title_field: name
+      card_subtitle_field: partner_id
+      card_body_fields:
+        - amount_total
+      card_footer_fields:
+        - invoice_date
+      group_field: state
+      draggable: true
+      drag_group_field: state
+
+alerts:
+  - key: gal_alert_draft_invoices
+    metric: demo.gallery.draft_invoices
+    condition: "value > 0"
+    severity: warning
+    channels: [notification]
+    cooldown: 3600
+
+charts:
+  - key: gal_kpi_revenue
+    type: kpi
+    metric: demo.gallery.revenue
+    label: Omsättning (jmf förra period)
+    comparison: previous_period
+    comparison_type: percentage
+    layout: {x: 0, y: 0, w: 2, h: 2}
+    config:
+      target: 200000
+
+  - key: gal_tile_orders
+    type: tile
+    metric: demo.gallery.orders
+    label: Ordrar
+    layout: {x: 2, y: 0, w: 2, h: 2}
+
+  - key: gal_meter_revenue
+    type: meter_chart
+    metric: demo.gallery.revenue
+    label: Mål (meter)
+    layout: {x: 4, y: 0, w: 2, h: 2}
+    config:
+      target: 200000
+
+  - key: gal_bar_country
+    type: bar_chart
+    metric: demo.gallery.partners_by_country
+    label: Bar — per land
+    layout: {x: 6, y: 0, w: 3, h: 4}
+    config:
+      group_by: country_id
+      sort: desc
+      limit: 6
+
+  - key: gal_column_country
+    type: column_chart
+    metric: demo.gallery.partners_by_country
+    label: Column — per land
+    layout: {x: 9, y: 0, w: 3, h: 4}
+    config:
+      group_by: country_id
+      sort: desc
+      limit: 6
+
+  - key: gal_line_revenue
+    type: line_chart
+    metric: demo.gallery.revenue
+    label: Line — omsättning per månad
+    layout: {x: 0, y: 2, w: 4, h: 4}
+    config:
+      group_by: date_order:month
+
+  - key: gal_area_revenue
+    type: area_chart
+    metric: demo.gallery.revenue
+    label: Area — omsättning per månad
+    layout: {x: 4, y: 2, w: 4, h: 4}
+    config:
+      group_by: date_order:month
+
+  - key: gal_pie_country
+    type: pie_chart
+    metric: demo.gallery.partners_by_country
+    label: Pie — per land
+    layout: {x: 8, y: 2, w: 4, h: 4}
+    config:
+      group_by: country_id
+      limit: 8
+
+  - key: gal_doughnut_active
+    type: doughnut_chart
+    metric: demo.gallery.partners_by_active
+    label: Doughnut — aktiv
+    layout: {x: 0, y: 6, w: 3, h: 4}
+    config:
+      group_by: active
+
+  - key: gal_funnel_state
+    type: funnel_chart
+    metric: demo.gallery.orders_by_state
+    label: Funnel — orderstatus
+    layout: {x: 3, y: 6, w: 3, h: 4}
+    config:
+      group_by: state
+      sort: desc
+
+  - key: gal_pyramid_state
+    type: pyramid_chart
+    metric: demo.gallery.orders_by_state
+    label: Pyramid — orderstatus
+    layout: {x: 6, y: 6, w: 3, h: 4}
+    config:
+      group_by: state
+      sort: desc
+
+  - key: gal_radar_country
+    type: radar_chart
+    metric: demo.gallery.partners_by_country
+    label: Radar — per land
+    layout: {x: 9, y: 6, w: 3, h: 4}
+    config:
+      group_by: country_id
+      limit: 6
+
+  - key: gal_radial_country
+    type: radial_chart
+    metric: demo.gallery.partners_by_country
+    label: Radial — per land
+    layout: {x: 0, y: 10, w: 3, h: 4}
+    config:
+      group_by: country_id
+      limit: 6
+
+  - key: gal_scatter_country
+    type: scatter_chart
+    metric: demo.gallery.partners_by_country
+    label: Scatter — per land
+    layout: {x: 3, y: 10, w: 3, h: 4}
+    config:
+      group_by: country_id
+      limit: 8
+
+  - key: gal_stacked_country
+    type: stackedcolumn_chart
+    metric: demo.gallery.partners_by_country
+    label: StackedColumn — per land
+    layout: {x: 6, y: 10, w: 3, h: 4}
+    config:
+      group_by: country_id
+      limit: 6
+
+  - key: gal_map_country
+    type: map_chart
+    metric: demo.gallery.partners_by_country
+    label: Map — världskarta
+    layout: {x: 9, y: 10, w: 3, h: 4}
+    config:
+      group_by: country_id
+
+  - key: gal_table_country
+    type: table
+    metric: demo.gallery.partners_by_country
+    label: Table — toppländer
+    layout: {x: 0, y: 14, w: 6, h: 4}
+    config:
+      group_by: country_id
+      sort: desc
+      limit: 10
+
+  - key: gal_list_country
+    type: list
+    metric: demo.gallery.partners_by_country
+    label: List — toppländer
+    layout: {x: 6, y: 14, w: 6, h: 4}
+    config:
+      group_by: country_id
+      sort: desc
+      limit: 10
+
+  - key: gal_kanban_invoices
+    type: kanban
+    metric: demo.gallery.invoices_kanban
+    label: Kanban — fakturor (draggable)
+    layout: {x: 0, y: 18, w: 12, h: 6}
+
+layout:
+  - chartId: gal_kpi_revenue
+    x: 0
+    y: 0
+    w: 2
+    h: 2
+  - chartId: gal_tile_orders
+    x: 2
+    y: 0
+    w: 2
+    h: 2
+  - chartId: gal_meter_revenue
+    x: 4
+    y: 0
+    w: 2
+    h: 2
+  - chartId: gal_bar_country
+    x: 6
+    y: 0
+    w: 3
+    h: 4
+  - chartId: gal_column_country
+    x: 9
+    y: 0
+    w: 3
+    h: 4
+  - chartId: gal_line_revenue
+    x: 0
+    y: 2
+    w: 4
+    h: 4
+  - chartId: gal_area_revenue
+    x: 4
+    y: 2
+    w: 4
+    h: 4
+  - chartId: gal_pie_country
+    x: 8
+    y: 2
+    w: 4
+    h: 4
+  - chartId: gal_doughnut_active
+    x: 0
+    y: 6
+    w: 3
+    h: 4
+  - chartId: gal_funnel_state
+    x: 3
+    y: 6
+    w: 3
+    h: 4
+  - chartId: gal_pyramid_state
+    x: 6
+    y: 6
+    w: 3
+    h: 4
+  - chartId: gal_radar_country
+    x: 9
+    y: 6
+    w: 3
+    h: 4
+  - chartId: gal_radial_country
+    x: 0
+    y: 10
+    w: 3
+    h: 4
+  - chartId: gal_scatter_country
+    x: 3
+    y: 10
+    w: 3
+    h: 4
+  - chartId: gal_stacked_country
+    x: 6
+    y: 10
+    w: 3
+    h: 4
+  - chartId: gal_map_country
+    x: 9
+    y: 10
+    w: 3
+    h: 4
+  - chartId: gal_table_country
+    x: 0
+    y: 14
+    w: 6
+    h: 4
+  - chartId: gal_list_country
+    x: 6
+    y: 14
+    w: 6
+    h: 4
+  - chartId: gal_kanban_invoices
+    x: 0
+    y: 18
+    w: 12
+    h: 6

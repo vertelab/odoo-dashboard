@@ -11,7 +11,7 @@ _logger = logging.getLogger(__name__)
 # This __init__ only provides the post_init_hook
 
 
-def _post_init_load_dashboards(cr, registry):
+def _post_init_load_dashboards(env):
     """Load all 7 persona dashboards on module install."""
     dashboards = [
         "cfo_daily",
@@ -24,7 +24,6 @@ def _post_init_load_dashboards(cr, registry):
     ]
     for name in dashboards:
         try:
-            env = registry.env
             env["dashboard.dashboard"].load_from_module_yaml(
                 "dashboard_vrtl_finance", f"data/dashboards/{name}.yaml"
             )

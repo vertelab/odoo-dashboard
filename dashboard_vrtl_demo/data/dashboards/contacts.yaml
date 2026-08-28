@@ -1,0 +1,152 @@
+dashboard:
+  key: demo_contacts
+  name: Demo — Contacts
+  name_sv: Demo — Kontakter
+  description: Kund- och leverantörsöversikt baserad på base-demo-data (res.partner).
+  icon: fa-address-book
+  category: Demo
+  parent_menu: dashboard_vrtl.parent_dashboard_menu
+  menu_sequence: 60
+  auto_refresh: 300000
+  cache_ttl: 300
+
+filters:
+  - key: period
+    type: date_range
+    label: Period
+    default:
+      from: this_year_start
+      to: today
+    shortcuts:
+      - label: Denna månad
+        from: this_month_start
+        to: today
+      - label: Senaste 30 dagarna
+        from: last_30_days
+        to: today
+      - label: Rullande 12 mån
+        from: 12_months_ago
+        to: today
+  - key: country
+    type: many2one
+    label: Land
+    model: res.country
+    field: country_id
+  - key: company
+    type: companies
+    label: Företag
+    field: company_id
+
+metrics:
+  - key: demo.contacts.total
+    label: Totala kontakter
+    source_type: model
+    model: res.partner
+    field: id
+    aggregation: count
+    unit: integer
+    date_field: create_date
+
+  - key: demo.contacts.by_country
+    label: Kontakter per land
+    source_type: model
+    model: res.partner
+    field: id
+    aggregation: count
+    unit: integer
+    date_field: create_date
+
+  - key: demo.contacts.by_state
+    label: Kontakter per status
+    source_type: model
+    model: res.partner
+    field: id
+    aggregation: count
+    unit: integer
+    date_field: create_date
+    domain:
+      - [active, "=", true]
+
+charts:
+  - key: kpi_total
+    type: kpi
+    metric: demo.contacts.total
+    label: Kontakter
+    layout: {x: 0, y: 0, w: 2, h: 2}
+
+  - key: chart_by_country_pie
+    type: pie_chart
+    metric: demo.contacts.by_country
+    label: Fördelning per land
+    layout: {x: 2, y: 0, w: 3, h: 4}
+    config:
+      group_by: country_id
+      limit: 10
+
+  - key: chart_by_country_bar
+    type: bar_chart
+    metric: demo.contacts.by_country
+    label: Toppländer
+    layout: {x: 5, y: 0, w: 3, h: 4}
+    config:
+      group_by: country_id
+      sort: desc
+      limit: 8
+
+  - key: chart_by_state
+    type: doughnut_chart
+    metric: demo.contacts.by_state
+    label: Aktiva vs inaktiva
+    layout: {x: 8, y: 0, w: 4, h: 4}
+    config:
+      group_by: active
+
+  - key: chart_country_table
+    type: table
+    metric: demo.contacts.by_country
+    label: Kontakter per land — tabell
+    layout: {x: 0, y: 4, w: 6, h: 4}
+    config:
+      group_by: country_id
+      sort: desc
+      limit: 10
+
+  - key: chart_country_map
+    type: map_chart
+    metric: demo.contacts.by_country
+    label: Kontakter på världskarta
+    layout: {x: 6, y: 4, w: 6, h: 4}
+    config:
+      group_by: country_id
+
+layout:
+  - chartId: kpi_total
+    x: 0
+    y: 0
+    w: 2
+    h: 2
+  - chartId: chart_by_country_pie
+    x: 2
+    y: 0
+    w: 3
+    h: 4
+  - chartId: chart_by_country_bar
+    x: 5
+    y: 0
+    w: 3
+    h: 4
+  - chartId: chart_by_state
+    x: 8
+    y: 0
+    w: 4
+    h: 4
+  - chartId: chart_country_table
+    x: 0
+    y: 4
+    w: 6
+    h: 4
+  - chartId: chart_country_map
+    x: 6
+    y: 4
+    w: 6
+    h: 4

@@ -8,10 +8,10 @@ from . import models
 _logger = logging.getLogger(__name__)
 
 
-def _post_init_load_dashboards(cr, registry):
+def _post_init_load_dashboards(env):
     """Load journal kanban dashboard YAML on module install."""
     try:
-        env = registry.env
+        env = env
         env["dashboard.dashboard"].load_from_module_yaml(
             "dashboard_vrtl_source_account", "dashboards/journal_kanban.yaml"
         )

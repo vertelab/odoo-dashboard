@@ -19,31 +19,31 @@ class Am5ThemeAnimated extends am5.Theme {
 window.am5themes_Animated = Am5ThemeAnimated;
 class Am5ThemeFrozen extends am5.Theme {
     setupDefaultRules() {
-        super.setupDefaultRules(),this.rule("ColorSet").setAll({colors:[u.Q1.fromHex(12502264),u.Q1.fromHex(10857454),u.Q1.fromHex(6974942),u.Q1.fromHex(5063375),u.Q1.fromHex(7421581),u.Q1.fromHex(10576032),u.Q1.fromHex(15429296),u.Q1.fromHex(16095163),u.Q1.fromHex(16496841),u.Q1.fromHex(16307416)],reuse:!0});
+        super.setupDefaultRules(),this.rule("ColorSet").setAll({colors:[am5.Color.fromHex(12502264),am5.Color.fromHex(10857454),am5.Color.fromHex(6974942),am5.Color.fromHex(5063375),am5.Color.fromHex(7421581),am5.Color.fromHex(10576032),am5.Color.fromHex(15429296),am5.Color.fromHex(16095163),am5.Color.fromHex(16496841),am5.Color.fromHex(16307416)],reuse:!0});
     }
 }
 window.am5themes_Frozen = Am5ThemeFrozen;
 class Am5ThemeKelly extends am5.Theme {
     setupDefaultRules() {
-        super.setupDefaultRules(),this.rule("ColorSet").setAll({colors:[f.Q1.fromHex(15975168),f.Q1.fromHex(8869522),f.Q1.fromHex(15959040),f.Q1.fromHex(10603249),f.Q1.fromHex(12451890),f.Q1.fromHex(12759680),f.Q1.fromHex(8684674),f.Q1.fromHex(34902),f.Q1.fromHex(15110060),f.Q1.fromHex(26533),f.Q1.fromHex(16356217),f.Q1.fromHex(6311575),f.Q1.fromHex(16164352),f.Q1.fromHex(11748460),f.Q1.fromHex(14471936),f.Q1.fromHex(8924439),f.Q1.fromHex(9287168),f.Q1.fromHex(6636834),f.Q1.fromHex(14833698),f.Q1.fromHex(2833702),f.Q1.fromHex(15922164),f.Q1.fromHex(2236962)],reuse:!0});
+        super.setupDefaultRules(),this.rule("ColorSet").setAll({colors:[am5.Color.fromHex(15975168),am5.Color.fromHex(8869522),am5.Color.fromHex(15959040),am5.Color.fromHex(10603249),am5.Color.fromHex(12451890),am5.Color.fromHex(12759680),am5.Color.fromHex(8684674),am5.Color.fromHex(34902),am5.Color.fromHex(15110060),am5.Color.fromHex(26533),am5.Color.fromHex(16356217),am5.Color.fromHex(6311575),am5.Color.fromHex(16164352),am5.Color.fromHex(11748460),am5.Color.fromHex(14471936),am5.Color.fromHex(8924439),am5.Color.fromHex(9287168),am5.Color.fromHex(6636834),am5.Color.fromHex(14833698),am5.Color.fromHex(2833702),am5.Color.fromHex(15922164),am5.Color.fromHex(2236962)],reuse:!0});
     }
 }
 window.am5themes_Kelly = Am5ThemeKelly;
 class Am5ThemeMaterial extends am5.Theme {
     setupDefaultRules() {
-        super.setupDefaultRules(),this.rule("ColorSet").setAll({colors:[f.Q1.fromHex(16007990),f.Q1.fromHex(15277667),f.Q1.fromHex(10233776),f.Q1.fromHex(6765239),f.Q1.fromHex(4149685),f.Q1.fromHex(2201331),f.Q1.fromHex(240116),f.Q1.fromHex(48340),f.Q1.fromHex(38536),f.Q1.fromHex(5025616),f.Q1.fromHex(9159498),f.Q1.fromHex(13491257),f.Q1.fromHex(16771899),f.Q1.fromHex(16761095),f.Q1.fromHex(16750592),f.Q1.fromHex(16733986),f.Q1.fromHex(7951688),f.Q1.fromHex(10395294),f.Q1.fromHex(6323595)],reuse:!0});
+        super.setupDefaultRules(),this.rule("ColorSet").setAll({colors:[am5.Color.fromHex(16007990),am5.Color.fromHex(15277667),am5.Color.fromHex(10233776),am5.Color.fromHex(6765239),am5.Color.fromHex(4149685),am5.Color.fromHex(2201331),am5.Color.fromHex(240116),am5.Color.fromHex(48340),am5.Color.fromHex(38536),am5.Color.fromHex(5025616),am5.Color.fromHex(9159498),am5.Color.fromHex(13491257),am5.Color.fromHex(16771899),am5.Color.fromHex(16761095),am5.Color.fromHex(16750592),am5.Color.fromHex(16733986),am5.Color.fromHex(7951688),am5.Color.fromHex(10395294),am5.Color.fromHex(6323595)],reuse:!0});
     }
 }
 window.am5themes_Material = Am5ThemeMaterial;
 class Am5ThemeMoonrise extends am5.Theme {
     setupDefaultRules() {
-        super.setupDefaultRules(),this.rule("ColorSet").setAll({colors:[s.Q1.fromHex(3805954),s.Q1.fromHex(6296069),s.Q1.fromHex(9054989),s.Q1.fromHex(13065764),s.Q1.fromHex(13082457),s.Q1.fromHex(10786154),s.Q1.fromHex(8815977),s.Q1.fromHex(7696225),s.Q1.fromHex(5792096),s.Q1.fromHex(6388099)],reuse:!0});
+        super.setupDefaultRules(),this.rule("ColorSet").setAll({colors:[am5.Color.fromHex(3805954),am5.Color.fromHex(6296069),am5.Color.fromHex(9054989),am5.Color.fromHex(13065764),am5.Color.fromHex(13082457),am5.Color.fromHex(10786154),am5.Color.fromHex(8815977),am5.Color.fromHex(7696225),am5.Color.fromHex(5792096),am5.Color.fromHex(6388099)],reuse:!0});
     }
 }
 window.am5themes_Moonrise = Am5ThemeMoonrise;
 class Am5ThemeSpirited extends am5.Theme {
     setupDefaultRules() {
-        super.setupDefaultRules(),this.rule("ColorSet").setAll({colors:[u.Q1.fromHex(6648718),u.Q1.fromHex(7761041),u.Q1.fromHex(7886447),u.Q1.fromHex(5389144),u.Q1.fromHex(8469309),u.Q1.fromHex(12344914),u.Q1.fromHex(15633272),u.Q1.fromHex(16369797),u.Q1.fromHex(15442012),u.Q1.fromHex(10178868)],reuse:!0});
+        super.setupDefaultRules(),this.rule("ColorSet").setAll({colors:[am5.Color.fromHex(6648718),am5.Color.fromHex(7761041),am5.Color.fromHex(7886447),am5.Color.fromHex(5389144),am5.Color.fromHex(8469309),am5.Color.fromHex(12344914),am5.Color.fromHex(15633272),am5.Color.fromHex(16369797),am5.Color.fromHex(15442012),am5.Color.fromHex(10178868)],reuse:!0});
     }
 }
 window.am5themes_Spirited = Am5ThemeSpirited;

@@ -4,7 +4,8 @@
         <div class="o_dashboard_chart_wrapper h-100 d-flex flex-column">
             <div class="o_chart_header d-flex justify-content-between align-items-center px-2 py-1">
                 <h5 class="m-0" t-esc="props.chart.name"/>
-                <span class="o_chart_actions" t-if="props.editable">
+                <span class="o_chart_actions" t-if="props.editable" t-on-click="openChartSettings"
+                      t-att-title="'Edit chart settings'">
                     <i class="fa fa-cog text-muted"/>
                 </span>
             </div>
@@ -16,22 +17,25 @@
                 </t>
                 <t t-elif="hasData">
                     <t t-if="props.chart.chart_type === 'bar_chart'">
-                        <BarChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                        <BarChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData" filterKey="props.chart.group_by_field" onFilterEvent="props.onFilterEvent"/>
                     </t>
                     <t t-elif="props.chart.chart_type === 'column_chart'">
-                        <ColumnChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                        <ColumnChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData" filterKey="props.chart.group_by_field" onFilterEvent="props.onFilterEvent"/>
                     </t>
                     <t t-elif="props.chart.chart_type === 'line_chart'">
                         <LineChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
                     </t>
                     <t t-elif="props.chart.chart_type === 'area_chart'">
-                        <AreaChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                        <AreaChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData" filterKey="props.chart.group_by_field" onFilterEvent="props.onFilterEvent"/>
                     </t>
                     <t t-elif="props.chart.chart_type === 'doughnut_chart'">
-                        <DoughnutChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                        <DoughnutChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData" filterKey="props.chart.group_by_field" onFilterEvent="props.onFilterEvent"/>
+                    </t>
+                    <t t-elif="props.chart.chart_type === 'pie_chart'">
+                        <PieChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData" filterKey="props.chart.group_by_field" onFilterEvent="props.onFilterEvent"/>
                     </t>
                     <t t-elif="props.chart.chart_type === 'funnel_chart'">
-                        <FunnelChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                        <FunnelChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData" filterKey="props.chart.group_by_field" onFilterEvent="props.onFilterEvent"/>
                     </t>
                     <t t-elif="props.chart.chart_type === 'pyramid_chart'">
                         <PyramidChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
@@ -46,7 +50,7 @@
                         <ScatterChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
                     </t>
                     <t t-elif="props.chart.chart_type === 'stackedcolumn_chart'">
-                        <StackedColumnChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>
+                        <StackedColumnChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData" filterKey="props.chart.group_by_field" onFilterEvent="props.onFilterEvent"/>
                     </t>
                     <t t-elif="props.chart.chart_type === 'map_chart'">
                         <MapChart chartId="props.chart.id" name="props.chart.name" theme="props.chart.theme" recordSets="displayData"/>

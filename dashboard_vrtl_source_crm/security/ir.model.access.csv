@@ -1,1 +1,2 @@
-id,access_crm_forecast,dashboard.source.crm.forecast,model_dashboard_source_crm_forecast,,1,0,0,0
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_crm_forecast,CRM Forecast Source,model_dashboard_source_crm_forecast,,1,0,0,0

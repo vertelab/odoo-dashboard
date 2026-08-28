@@ -19,8 +19,11 @@
                         <field name="default_to"/>
                         <field name="shortcuts" widget="jsonb"/>
                     </group>
-                    <group invisible="filter_type != 'many2one'">
-                        <field name="model"/>
+                    <group invisible="filter_type not in ('many2one', 'selection')">
+                        <field name="model_id" required="filter_type == 'many2one'"/>
+                        <field name="field_id"
+                               required="filter_type == 'many2one'"
+                               readonly="not model_id"/>
                     </group>
                 </sheet>
             </form>

@@ -30,4 +30,10 @@
               parent="parent_dashboard_menu"
               action="dashboard_alert_action"
               sequence="40"/>
+
+    <menuitem id="menu_email_schedules"
+              name="Email Schedules"
+              parent="parent_dashboard_menu"
+              action="dashboard_mail_action"
+              sequence="50"/>
 </odoo>

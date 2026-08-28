@@ -1,0 +1,151 @@
+dashboard:
+  key: demo_sales
+  name: Demo — Sales
+  name_sv: Demo — Försäljning
+  description: Säljöversikt baserad på sale-demo-data (sale.order, sale.order.line).
+  icon: fa-chart-line
+  category: Demo
+  parent_menu: dashboard_vrtl.parent_dashboard_menu
+  menu_sequence: 90
+  auto_refresh: 300000
+  cache_ttl: 300
+
+filters:
+  - key: period
+    type: date_range
+    label: Period
+    default:
+      from: this_year_start
+      to: today
+    shortcuts:
+      - label: Denna månad
+        from: this_month_start
+        to: today
+      - label: Senaste kvartalet
+        from: this_quarter_start
+        to: today
+      - label: Rullande 12 mån
+        from: 12_months_ago
+        to: today
+  - key: salesperson
+    type: many2one
+    label: Säljare
+    model: res.users
+    field: user_id
+
+metrics:
+  - key: demo.sales.revenue
+    label: Nettoomsättning
+    source_type: model
+    model: sale.order
+    field: amount_total
+    aggregation: sum
+    unit: monetary
+    date_field: date_order
+    domain:
+      - [state, not in, [draft, cancel, sent]]
+
+  - key: demo.sales.orders
+    label: Antal ordrar
+    source_type: model
+    model: sale.order
+    field: id
+    aggregation: count
+    unit: integer
+    date_field: date_order
+    domain:
+      - [state, not in, [draft, cancel, sent]]
+
+  - key: demo.sales.by_state
+    label: Ordrar per status
+    source_type: model
+    model: sale.order
+    field: id
+    aggregation: count
+    unit: integer
+    date_field: date_order
+    domain:
+      - [state, not in, [cancel]]
+
+  - key: demo.sales.top_products
+    label: Toppsäljande produkter
+    source_type: model
+    model: sale.order.line
+    field: price_subtotal
+    aggregation: sum
+    unit: monetary
+    date_field: order_id.date_order
+    domain:
+      - [order_id.state, not in, [draft, cancel, sent]]
+      - [product_id, "!=", false]
+
+charts:
+  - key: kpi_revenue
+    type: kpi
+    metric: demo.sales.revenue
+    label: Omsättning
+    comparison: previous_period
+    layout: {x: 0, y: 0, w: 2, h: 2}
+
+  - key: kpi_orders
+    type: kpi
+    metric: demo.sales.orders
+    label: Ordrar
+    layout: {x: 2, y: 0, w: 2, h: 2}
+
+  - key: chart_revenue_trend
+    type: line_chart
+    metric: demo.sales.revenue
+    label: Omsättning — trend
+    layout: {x: 0, y: 2, w: 6, h: 4}
+    config:
+      group_by: date_order:month
+
+  - key: chart_top_products
+    type: bar_chart
+    metric: demo.sales.top_products
+    label: Topp 5 produkter
+    layout: {x: 6, y: 2, w: 3, h: 4}
+    config:
+      group_by: product_id
+      sort: desc
+      limit: 5
+    drill:
+      path:
+        - field: product_id
+          label: Produkt
+
+  - key: chart_by_state
+    type: doughnut_chart
+    metric: demo.sales.by_state
+    label: Ordrar per status
+    layout: {x: 9, y: 2, w: 3, h: 4}
+    config:
+      group_by: state
+
+layout:
+  - chartId: kpi_revenue
+    x: 0
+    y: 0
+    w: 2
+    h: 2
+  - chartId: kpi_orders
+    x: 2
+    y: 0
+    w: 2
+    h: 2
+  - chartId: chart_revenue_trend
+    x: 0
+    y: 2
+    w: 6
+    h: 4
+  - chartId: chart_top_products
+    x: 6
+    y: 2
+    w: 3
+    h: 4
+  - chartId: chart_by_state
+    x: 9
+    y: 2
+    w: 3
+    h: 4

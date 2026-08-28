@@ -1,1 +1,2 @@
-id,access_account_journals_source,dashboard.source.account.journals,model_dashboard_source_account_journals,,1,0,0,0
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_account_journals_source,Account Journals Source,model_dashboard_source_account_journals,,1,0,0,0

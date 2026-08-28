@@ -5,6 +5,10 @@
         <field name="model">dashboard.metric</field>
         <field name="arch" type="xml">
             <form string="Metric">
+                <header>
+                    <button name="action_view_records" type="object" string="View Records"
+                            class="oe_highlight" invisible="not model_id"/>
+                </header>
                 <sheet>
                     <div class="oe_title"><h1><field name="name" placeholder="Metric Name"/></h1></div>
                     <group col="2">
@@ -24,8 +28,10 @@
                         <page string="Kanban" name="kanban" invisible="source_type == 'composite'">
                             <group col="2">
                                 <group string="Card Layout">
-                                    <field name="card_title_field"/>
-                                    <field name="card_subtitle_field"/>
+                                    <field name="card_title_field_id" readonly="not model_id"/>
+                                    <field name="card_subtitle_field_id" readonly="not model_id"/>
+                                    <field name="card_title_field" invisible="source_type == 'model'"/>
+                                    <field name="card_subtitle_field" invisible="source_type == 'model'"/>
                                 </group>
                                 <group string="State">
                                     <field name="state_field"/>
@@ -34,8 +40,10 @@
                                 </group>
                             </group>
                             <group string="Card Fields">
-                                <field name="card_body_fields" widget="ace" options="{'mode': 'javascript'}"/>
-                                <field name="card_footer_fields" widget="ace" options="{'mode': 'javascript'}"/>
+                                <field name="card_body_field_ids" widget="many2many_tags" readonly="not model_id"/>
+                                <field name="card_footer_field_ids" widget="many2many_tags" readonly="not model_id"/>
+                                <field name="card_body_fields" widget="ace" options="{'mode': 'javascript'}" invisible="source_type == 'model'"/>
+                                <field name="card_footer_fields" widget="ace" options="{'mode': 'javascript'}" invisible="source_type == 'model'"/>
                             </group>
                             <group string="Actions &amp; Grouping">
                                 <field name="card_actions" widget="ace" options="{'mode': 'javascript'}"/>
@@ -45,8 +53,8 @@
                         <page string="Source" name="source">
                             <group invisible="source_type != 'model'">
                                 <field name="model_id"/>
-                                <field name="field_id" domain="[('model_id','=',model_id)]"/>
-                                <field name="date_field_id" domain="[('model_id','=',model_id)]"/>
+                                <field name="field_id" readonly="not model_id" domain="[('model_id','=', model_id or False)]"/>
+                                <field name="date_field_id" readonly="not model_id" domain="[('model_id','=', model_id or False), ('ttype','in',['date','datetime'])]"/>
                                 <field name="default_domain" widget="domain"/>
                             </group>
                             <group invisible="source_type != 'sql'">

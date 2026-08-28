@@ -15,7 +15,19 @@ class DashboardFilter(models.Model):
         ("date_range", "Date Range"), ("many2one", "Many2One"),
         ("companies", "Companies"), ("selection", "Selection"),
     ], required=True, default="date_range")
-    model = fields.Char(help="Odoo model for many2one type, e.g. 'res.partner'")
+    model = fields.Char(help="Technical Odoo model name for many2one type, e.g. 'res.partner'")
+    model_id = fields.Many2one(
+        "ir.model", string="Filter Model",
+        help="Model whose records this filter selects (many2one type).")
+    field = fields.Char(
+        string="Filter Field",
+        help="Field name on the metric/chart models that this filter maps to "
+             "(e.g. 'brand_id', 'account_id'). The selected value is applied as "
+             "[field, '=', value] on compatible charts.")
+    field_id = fields.Many2one(
+        "ir.model.fields", string="Filter Field (picker)",
+        domain="[('model_id','=', model_id or False)]",
+        help="Convenience picker for the filter field. Syncs into the field name.")
     optional = fields.Boolean(default=True)
     sequence = fields.Integer(default=10)
     default_from = fields.Char(help="Default 'from' for date_range, e.g. 'this_year_start'")
@@ -35,6 +47,19 @@ class DashboardFilter(models.Model):
             "default_to": data.get("default", {}).get("to") if isinstance(data.get("default"), dict) else None,
             "shortcuts": data.get("shortcuts", []),
         }
+        # Resolve model_id / field_id (many2one & selection filters)
+        if data.get("model"):
+            model_rec = self.env["ir.model"].sudo().search([("model", "=", data["model"])], limit=1)
+            if model_rec:
+                vals["model_id"] = model_rec.id
+        if data.get("field"):
+            vals["field"] = data["field"]
+            field = self.env["ir.model.fields"].sudo().search([
+                ("model_id.model", "=", vals.get("model") or data.get("model")),
+                ("name", "=", data["field"]),
+            ], limit=1)
+            if field:
+                vals["field_id"] = field.id
         if existing:
             existing.write(vals)
             return existing
@@ -47,4 +72,20 @@ class DashboardFilter(models.Model):
             "model": self.model, "optional": self.optional,
             "default": {"from": self.default_from, "to": self.default_to} if self.default_from else None,
             "shortcuts": self.shortcuts,
+        }
+
+    def _filter_to_dict(self):
+        """Serialize the filter for the dashboard frontend (filter bar)."""
+        self.ensure_one()
+        return {
+            "key": self.key,
+            "name": self.name,
+            "type": self.filter_type,
+            "model": self.model or (self.model_id.model if self.model_id else False),
+            "model_id": self.model_id.id if self.model_id else False,
+            "field": self.field or (self.field_id.name if self.field_id else False),
+            "optional": self.optional,
+            "default_from": self.default_from,
+            "default_to": self.default_to,
+            "shortcuts": self.shortcuts or [],
         }

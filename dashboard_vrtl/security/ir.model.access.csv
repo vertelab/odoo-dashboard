@@ -14,3 +14,7 @@ access_dashboard_alert_user,dashboard.alert.user,model_dashboard_alert,group_das
 access_dashboard_cache,dashboard.cache,model_dashboard_cache,group_dashboard_manager,1,1,1,1
 access_dashboard_taxonomy_concept,dashboard.taxonomy.concept,model_dashboard_taxonomy_concept,group_dashboard_manager,1,1,1,1
 access_dashboard_taxonomy_concept_user,dashboard.taxonomy.concept.user,model_dashboard_taxonomy_concept,group_dashboard_user,1,0,0,0
+access_dashboard_chart_filter_mapping_manager,dashboard.chart.filter.mapping.manager,model_dashboard_chart_filter_mapping,group_dashboard_manager,1,1,1,1
+access_dashboard_chart_filter_mapping_user,dashboard.chart.filter.mapping.user,model_dashboard_chart_filter_mapping,group_dashboard_user,1,0,0,0
+access_dashboard_mail_manager,dashboard.mail.manager,model_dashboard_mail,group_dashboard_manager,1,1,1,1
+access_dashboard_mail_user,dashboard.mail.user,model_dashboard_mail,group_dashboard_user,1,0,0,0

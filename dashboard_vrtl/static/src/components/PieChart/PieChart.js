@@ -11,6 +11,8 @@ export class PieChart extends Component {
     isDirty: { optional: true, type: Boolean },
     data: { optional: true, type: Object },
     update_chart: { optional: true, type: Function },
+    filterKey: { optional: true, type: String },
+    onFilterEvent: { optional: true, type: Function },
     theme: String,
     recordSets: Object,
     export: { optional: true, type: Function },
@@ -88,6 +90,18 @@ export class PieChart extends Component {
           "column_chart",
           ev.target.dataItem.dataContext,
         );
+      }
+      if (self.props.onFilterEvent && self.props.filterKey) {
+          const ctx = ev.target.dataItem.dataContext || {};
+          const value = ctx._value !== undefined ? ctx._value : ctx.category;
+          if (value !== undefined && value !== null && value !== "") {
+              self.props.onFilterEvent({
+                  filterKey: self.props.filterKey,
+                  value: value,
+                  label: ctx.category,
+                  sourceChart: self.props.chartId,
+              });
+          }
       }
     });
 

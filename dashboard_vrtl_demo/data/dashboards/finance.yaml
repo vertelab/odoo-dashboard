@@ -1,0 +1,221 @@
+dashboard:
+  key: demo_finance
+  name: Demo — Finance
+  name_sv: Demo — Ekonomi
+  description: Finansiell översikt baserad på account-demo-data (account.move, account.move.line). Visar även today_approx-sentineln.
+  icon: fa-calculator
+  category: Demo
+  parent_menu: dashboard_vrtl.parent_dashboard_menu
+  menu_sequence: 100
+  auto_refresh: 900000
+  cache_ttl: 900
+
+filters:
+  - key: period
+    type: date_range
+    label: Period
+    default:
+      from: this_year_start
+      to: today
+    shortcuts:
+      - label: Denna månad
+        from: this_month_start
+        to: today
+      - label: Senaste kvartalet
+        from: this_quarter_start
+        to: today
+  - key: company
+    type: companies
+    label: Företag
+    field: company_id
+
+metrics:
+  - key: demo.fin.revenue
+    label: Intäkter
+    source_type: model
+    model: account.move.line
+    field: credit
+    aggregation: sum
+    unit: monetary
+    date_field: date
+    domain:
+      - [parent_state, "=", posted]
+      - [account_id.account_type, in, [income, income_other]]
+
+  - key: demo.fin.expenses
+    label: Kostnader
+    source_type: model
+    model: account.move.line
+    field: debit
+    aggregation: sum
+    unit: monetary
+    date_field: date
+    domain:
+      - [parent_state, "=", posted]
+      - [account_id.account_type, in, [expense, expense_depreciation, expense_direct_cost]]
+
+  - key: demo.fin.bank
+    label: Bank
+    source_type: model
+    model: account.move.line
+    field: balance
+    aggregation: sum
+    unit: monetary
+    domain:
+      - [parent_state, "=", posted]
+      - [account_id.account_type, in, [asset_cash, liability_credit_card]]
+
+  - key: demo.fin.ar
+    label: Kundfordringar (AR)
+    source_type: model
+    model: account.move.line
+    field: balance
+    aggregation: sum
+    unit: monetary
+    domain:
+      - [parent_state, "=", posted]
+      - [account_id.account_type, "=", asset_receivable]
+      - [reconciled, "=", false]
+
+  - key: demo.fin.ap
+    label: Leverantörsskulder (AP)
+    source_type: model
+    model: account.move.line
+    field: balance
+    aggregation: sum
+    unit: monetary
+    domain:
+      - [parent_state, "=", posted]
+      - [account_id.account_type, "=", liability_payable]
+      - [reconciled, "=", false]
+
+  - key: demo.fin.draft_invoices
+    label: Utkastfakturor
+    source_type: model
+    model: account.move
+    field: id
+    aggregation: count
+    unit: integer
+    domain:
+      - [state, "=", draft]
+      - [move_type, in, [out_invoice, out_refund, in_invoice, in_refund]]
+
+  - key: demo.fin.late_invoices
+    label: Förfallna fakturor
+    source_type: model
+    model: account.move
+    field: id
+    aggregation: count
+    unit: integer
+    domain:
+      - [state, "=", posted]
+      - [payment_state, in, [not_paid, partial]]
+      - [invoice_date_due, "<", today_approx]
+
+  - key: demo.fin.moves_by_journal
+    label: Bokföringar per journal
+    source_type: model
+    model: account.move
+    field: id
+    aggregation: count
+    unit: integer
+    date_field: invoice_date
+    domain:
+      - [state, "=", posted]
+
+charts:
+  - key: kpi_revenue
+    type: kpi
+    metric: demo.fin.revenue
+    label: Intäkter
+    layout: {x: 0, y: 0, w: 2, h: 2}
+
+  - key: kpi_expenses
+    type: kpi
+    metric: demo.fin.expenses
+    label: Kostnader
+    layout: {x: 2, y: 0, w: 2, h: 2}
+
+  - key: kpi_bank
+    type: kpi
+    metric: demo.fin.bank
+    label: Bank
+    layout: {x: 4, y: 0, w: 2, h: 2}
+
+  - key: kpi_ar
+    type: kpi
+    metric: demo.fin.ar
+    label: AR
+    layout: {x: 6, y: 0, w: 2, h: 2}
+
+  - key: kpi_ap
+    type: kpi
+    metric: demo.fin.ap
+    label: AP
+    layout: {x: 8, y: 0, w: 2, h: 2}
+
+  - key: kpi_late
+    type: kpi
+    metric: demo.fin.late_invoices
+    label: Förfallna
+    layout: {x: 10, y: 0, w: 2, h: 2}
+
+  - key: chart_revenue_expenses
+    type: line_chart
+    metric: demo.fin.revenue
+    label: Intäkter — trend
+    layout: {x: 0, y: 2, w: 6, h: 4}
+    config:
+      group_by: date:month
+
+  - key: chart_by_journal
+    type: bar_chart
+    metric: demo.fin.moves_by_journal
+    label: Bokföringar per journal
+    layout: {x: 6, y: 2, w: 6, h: 4}
+    config:
+      group_by: journal_id
+      sort: desc
+      limit: 8
+
+layout:
+  - chartId: kpi_revenue
+    x: 0
+    y: 0
+    w: 2
+    h: 2
+  - chartId: kpi_expenses
+    x: 2
+    y: 0
+    w: 2
+    h: 2
+  - chartId: kpi_bank
+    x: 4
+    y: 0
+    w: 2
+    h: 2
+  - chartId: kpi_ar
+    x: 6
+    y: 0
+    w: 2
+    h: 2
+  - chartId: kpi_ap
+    x: 8
+    y: 0
+    w: 2
+    h: 2
+  - chartId: kpi_late
+    x: 10
+    y: 0
+    w: 2
+    h: 2
+  - chartId: chart_revenue_expenses
+    x: 0
+    y: 2
+    w: 6
+    h: 4
+  - chartId: chart_by_journal
+    x: 6
+    y: 2
+    w: 6
+    h: 4

@@ -1,0 +1,140 @@
+dashboard:
+  key: demo_projects
+  name: Demo — Projects
+  name_sv: Demo — Projekt
+  description: Projektöversikt baserad på project-demo-data (project.project, project.task).
+  icon: fa-tasks
+  category: Demo
+  parent_menu: dashboard_vrtl.parent_dashboard_menu
+  menu_sequence: 120
+  auto_refresh: 900000
+  cache_ttl: 600
+
+filters:
+  - key: period
+    type: date_range
+    label: Deadline
+    default:
+      from: this_year_start
+      to: today
+  - key: project
+    type: many2one
+    label: Projekt
+    model: project.project
+    field: project_id
+
+metrics:
+  - key: demo.proj.tasks
+    label: Uppgifter
+    source_type: model
+    model: project.task
+    field: id
+    aggregation: count
+    unit: integer
+    date_field: date_deadline
+
+  - key: demo.proj.open
+    label: Öppna uppgifter
+    source_type: model
+    model: project.task
+    field: id
+    aggregation: count
+    unit: integer
+    date_field: date_deadline
+    domain:
+      - [state, not in, [done, cancel]]
+
+  - key: demo.proj.by_state
+    label: Uppgifter per status
+    source_type: model
+    model: project.task
+    field: id
+    aggregation: count
+    unit: integer
+    date_field: date_deadline
+
+  - key: demo.proj.by_project
+    label: Uppgifter per projekt
+    source_type: model
+    model: project.task
+    field: id
+    aggregation: count
+    unit: integer
+    date_field: date_deadline
+    domain:
+      - [project_id, "!=", false]
+
+  - key: demo.proj.by_priority
+    label: Uppgifter per prioritet
+    source_type: model
+    model: project.task
+    field: id
+    aggregation: count
+    unit: integer
+    date_field: date_deadline
+
+charts:
+  - key: kpi_tasks
+    type: kpi
+    metric: demo.proj.tasks
+    label: Uppgifter
+    layout: {x: 0, y: 0, w: 2, h: 2}
+
+  - key: kpi_open
+    type: kpi
+    metric: demo.proj.open
+    label: Öppna
+    layout: {x: 2, y: 0, w: 2, h: 2}
+
+  - key: chart_by_state
+    type: bar_chart
+    metric: demo.proj.by_state
+    label: Uppgifter per status
+    layout: {x: 4, y: 0, w: 4, h: 4}
+    config:
+      group_by: state
+
+  - key: chart_by_project
+    type: pie_chart
+    metric: demo.proj.by_project
+    label: Per projekt
+    layout: {x: 8, y: 0, w: 4, h: 4}
+    config:
+      group_by: project_id
+      limit: 8
+
+  - key: chart_by_priority
+    type: table
+    metric: demo.proj.by_priority
+    label: Per prioritet — tabell
+    layout: {x: 4, y: 4, w: 4, h: 3}
+    config:
+      group_by: priority
+      sort: asc
+
+layout:
+  - chartId: kpi_tasks
+    x: 0
+    y: 0
+    w: 2
+    h: 2
+  - chartId: kpi_open
+    x: 2
+    y: 0
+    w: 2
+    h: 2
+  - chartId: chart_by_state
+    x: 4
+    y: 0
+    w: 4
+    h: 4
+  - chartId: chart_by_project
+    x: 8
+    y: 0
+    w: 4
+    h: 4
+  - chartId: chart_by_priority
+    x: 4
+    y: 4
+    w: 4
+    h: 3

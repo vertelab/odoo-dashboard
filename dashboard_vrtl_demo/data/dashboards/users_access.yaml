@@ -1,0 +1,103 @@
+dashboard:
+  key: demo_users_access
+  name: Demo — Users & Access
+  name_sv: Demo — Användare & åtkomst
+  description: Användaröversikt baserad på base-demo-data (res.users, res.company).
+  icon: fa-users
+  category: Demo
+  parent_menu: dashboard_vrtl.parent_dashboard_menu
+  menu_sequence: 70
+  auto_refresh: 900000
+  cache_ttl: 600
+
+filters:
+  - key: company
+    type: companies
+    label: Företag
+    field: company_id
+
+metrics:
+  - key: demo.users.total
+    label: Användare
+    source_type: model
+    model: res.users
+    field: id
+    aggregation: count
+    unit: integer
+
+  - key: demo.users.by_company
+    label: Användare per företag
+    source_type: model
+    model: res.users
+    field: id
+    aggregation: count
+    unit: integer
+
+  - key: demo.users.by_active
+    label: Aktiva vs inaktiva
+    source_type: model
+    model: res.users
+    field: id
+    aggregation: count
+    unit: integer
+
+  - key: demo.users.portal
+    label: Portal-användare
+    source_type: model
+    model: res.users
+    field: id
+    aggregation: count
+    unit: integer
+    domain:
+      - [share, "=", true]
+
+charts:
+  - key: kpi_total
+    type: kpi
+    metric: demo.users.total
+    label: Användare
+    layout: {x: 0, y: 0, w: 2, h: 2}
+
+  - key: kpi_portal
+    type: kpi
+    metric: demo.users.portal
+    label: Portal
+    layout: {x: 2, y: 0, w: 2, h: 2}
+
+  - key: chart_by_company
+    type: doughnut_chart
+    metric: demo.users.by_company
+    label: Användare per företag
+    layout: {x: 4, y: 0, w: 4, h: 4}
+    config:
+      group_by: company_id
+
+  - key: chart_by_active
+    type: bar_chart
+    metric: demo.users.by_active
+    label: Aktiva vs inaktiva
+    layout: {x: 8, y: 0, w: 4, h: 4}
+    config:
+      group_by: active
+
+layout:
+  - chartId: kpi_total
+    x: 0
+    y: 0
+    w: 2
+    h: 2
+  - chartId: kpi_portal
+    x: 2
+    y: 0
+    w: 2
+    h: 2
+  - chartId: chart_by_company
+    x: 4
+    y: 0
+    w: 4
+    h: 4
+  - chartId: chart_by_active
+    x: 8
+    y: 0
+    w: 4
+    h: 4

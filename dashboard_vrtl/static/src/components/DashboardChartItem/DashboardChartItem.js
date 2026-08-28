@@ -1,6 +1,7 @@
 /** @odoo-module **/
 
 import { Component } from "@odoo/owl";
+import { useService } from "@web/core/utils/hooks";
 
 import { AreaChart } from "../AreaChart/AreaChart";
 import { BarChart } from "../BarChart/BarChart";
@@ -50,6 +51,11 @@ function toRowArray(data, valueOnly = false) {
             };
         }
         const row = { category: label };
+        if (Array.isArray(data.values)) {
+            // Stored value (record id, selection key, ...) for cross-chart
+            // filtering — distinct from the display label.
+            row._value = data.values[i];
+        }
         for (const s of series) {
             if (s && s.name !== undefined && Array.isArray(s.values)) {
                 row[s.name] = s.values[i];
@@ -98,7 +104,9 @@ export function normalizeChartData(chart) {
             return data;
         }
         const value = firstValue(data);
-        const target = data && data.target !== undefined ? data.target : value || 100;
+        const target = data && data.target !== undefined
+            ? data.target
+            : (chart.kpi_target_value || value || 100);
         return { current_value: value, target: target };
     }
 
@@ -128,10 +136,13 @@ export function normalizeChartData(chart) {
         if (data.layout_type) {
             return data; // rich format from service source
         }
-        return {
+        const count = firstValue(data);
+        const comparison = data.comparison || null;
+        const target = chart.kpi_target_value || 0;
+        const normalized = {
             layout_type: "layout1",
             name: firstLabel(data, chart.name || "KPI"),
-            count: firstValue(data),
+            count,
             count2: 0,
             comparison: "none",
             background_color: chart.background_color || "#ffffff",
@@ -145,13 +156,30 @@ export function normalizeChartData(chart) {
             is_kpi_border: false,
             kpi_border_width: 2,
             kpi_border_color: "#dee2e6",
-            target: "",
-            kpi_enable_target: false,
+            target: target ? String(target) : "",
+            kpi_enable_target: !!target,
             kpi_view_type: "progress",
             color: "bg-success",
             progress: 0,
             tooltip_info: chart.name,
         };
+        if (comparison) {
+            const delta = comparison.delta;
+            normalized.comparison = comparison.type === "value" ? "ratio" : "percentage";
+            if (comparison.type === "value") {
+                normalized.count2 = delta;
+            }
+            normalized.previous_data = { standard: comparison.previous_value };
+            normalized.arrow = delta < 0 ? "down" : "up";
+            normalized.standard = delta === null || delta === undefined
+                ? ""
+                : (comparison.type === "percentage" ? delta.toFixed(1) + "%" : delta);
+            normalized.message = "vs föregående period";
+        }
+        if (target && count > 0) {
+            normalized.progress = Math.min(100, Math.round((count / target) * 100));
+        }
+        return normalized;
     }
 
     // Tile
@@ -221,7 +249,25 @@ export class DashboardChartItem extends Component {
     static props = {
         chart: Object,
         editable: { type: Boolean, optional: true },
+        onFilterEvent: { optional: true, type: Function },
+        onDrillEvent: { optional: true, type: Function },
     };
+
+    setup() {
+        this.action = useService("action");
+    }
+
+    openChartSettings() {
+        // Gear icon in edit mode: open this chart's configuration form
+        const chartId = parseInt(this.props.chart.id, 10);
+        if (!chartId) return;
+        this.action.doAction({
+            type: "ir.actions.act_window",
+            res_model: "dashboard.chart",
+            res_id: chartId,
+            views: [[false, "form"]],
+        });
+    }
 
     get displayData() {
         return normalizeChartData(this.props.chart);
