@@ -186,14 +186,21 @@ export function normalizeChartData(chart) {
             rows = toRowArray(data, false);
         }
         if (Array.isArray(rows)) {
-            rows = rows.map((r) => ({
+            // Rows derived from {labels, series} carry no id (only category/
+            // _value/series values). Give each row a stable, unique key so the
+            // ListView t-foreach never sees duplicate/undefined record ids
+            // ("Got duplicate key in t-foreach: undefined").
+            rows = rows.map((r, i) => ({
                 ...r,
-                currentIds: r.currentIds || (r.id !== undefined ? [r.id] : []),
+                id: r.id !== undefined && r.id !== null
+                    ? r.id
+                    : (r._value !== undefined && r._value !== null ? `v_${r._value}` : `row_${i}`),
+                currentIds: r.currentIds || (r.id !== undefined && r.id !== null ? [r.id] : []),
             }));
         }
         const columns = rows && rows.length
             ? Object.keys(rows[0])
-                  .filter((k) => k !== "currentIds")
+                  .filter((k) => k !== "currentIds" && k !== "id")
                   .map((k) => ({ column_name: k, name: k, id: k }))
             : [];
         return { columns, records: rows || [], name: chart.name, model: data.model || "" };

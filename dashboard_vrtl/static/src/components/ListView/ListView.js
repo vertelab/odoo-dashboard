@@ -128,9 +128,21 @@ export class ListView extends Component {
       return acc;
     }, {});
 
-    this.state.data = data.records;
-    this.state.totalRecords = data.records.length;
-    this.state.totalPages = Math.ceil(data.records.length / 10);
+    // Ensure every record carries a stable, unique id: the table template keys
+    // t-foreach on record.id, and records from service/derived sources often
+    // have no id field at all (previously raised
+    // "Got duplicate key in t-foreach: undefined").
+    this.state.data = (data.records || []).map((record, index) => {
+        if (record && record.id !== undefined && record.id !== null) {
+            return record;
+        }
+        const stableId = record && record._value !== undefined && record._value !== null
+            ? `v_${record._value}`
+            : `row_${index}`;
+        return { ...record, id: stableId };
+    });
+    this.state.totalRecords = this.state.data.length;
+    this.state.totalPages = Math.ceil(this.state.data.length / 10);
     this.state.dataModel = data.model;
   }
 }
