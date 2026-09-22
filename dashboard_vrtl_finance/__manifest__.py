@@ -7,7 +7,7 @@
     "category": "Reporting",
     "summary": "Pre-built finance dashboards for dashboard_vrtl",
     "author": "Vertel Sverige AB",
-    "website": "https://vertel.se",
+    "website": "https://vertel.se/apps/odoo-dashboard/dashboard_vrtl_finance",
     "license": "AGPL-3",
     "depends": ["dashboard_vrtl", "account"],
     "data": ["data/dashboard_data.xml", "views/settings.xml"],

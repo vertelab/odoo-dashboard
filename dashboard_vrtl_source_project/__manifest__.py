@@ -4,7 +4,7 @@
     "category": "Reporting",
     "summary": "Project P&L, WIP, and budget data sources for Vertel Dashboard",
     "author": "Vertel Sverige AB",
-    "website": "https://vertel.se",
+    "website": "https://vertel.se/apps/odoo-dashboard/dashboard_vrtl_source_project",
     "license": "AGPL-3",
     "depends": ["dashboard_vrtl", "project", "hr_timesheet"],
     "data": [

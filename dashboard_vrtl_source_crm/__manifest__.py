@@ -4,7 +4,7 @@
     "category": "Reporting",
     "summary": "CRM pipeline forecast data source for Vertel Dashboard",
     "author": "Vertel Sverige AB",
-    "website": "https://vertel.se",
+    "website": "https://vertel.se/apps/odoo-dashboard/dashboard_vrtl_source_crm",
     "license": "AGPL-3",
     "depends": ["dashboard_vrtl", "crm"],
     "data": [

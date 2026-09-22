@@ -7,7 +7,7 @@
     "category": "Reporting",
     "summary": "Pre-built sales dashboards for dashboard_vrtl",
     "author": "Vertel Sverige AB",
-    "website": "https://vertel.se",
+    "website": "https://vertel.se/apps/odoo-dashboard/dashboard_vrtl_sales",
     "license": "AGPL-3",
     "depends": ["dashboard_vrtl", "sale"],
     "data": ["data/dashboard_data.xml"],

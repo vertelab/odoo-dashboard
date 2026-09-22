@@ -7,7 +7,7 @@
     "category": "Education",
     "summary": "eLearning course: Build BI dashboards with dashboard_vrtl",
     "author": "Vertel Sverige AB",
-    "website": "https://vertel.se",
+    "website": "https://vertel.se/apps/odoo-dashboard/dashboard_vrtl_lms",
     "license": "AGPL-3",
     "depends": ["dashboard_vrtl", "website_slides"],
     "data": [

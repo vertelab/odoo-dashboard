@@ -7,7 +7,7 @@
     "category": "Reporting",
     "summary": "Full demo dashboards for dashboard_vrtl built on Odoo demo data (model sources only)",
     "author": "Vertel Sverige AB",
-    "website": "https://vertel.se",
+    "website": "https://vertel.se/apps/odoo-dashboard/dashboard_vrtl_demo",
     "license": "AGPL-3",
     "depends": ["dashboard_vrtl", "sale", "account", "crm", "project"],
     "data": ["data/dashboard_data.xml"],

@@ -7,7 +7,7 @@
     "category": "Reporting",
     "summary": "Enterprise BI dashboard platform with semantic metrics, alerting, and cross-chart interactivity",
     "author": "Vertel Sverige AB",
-    "website": "https://vertel.se",
+    "website": "https://vertel.se/apps/odoo-dashboard/dashboard_vrtl",
     "license": "AGPL-3",
     "depends": ["web", "mail", "base"],
     "external_dependencies": {},

@@ -7,7 +7,7 @@
     "category": "Reporting",
     "summary": "Account journal and financial data sources for Vertel Dashboard",
     "author": "Vertel Sverige AB",
-    "website": "https://vertel.se",
+    "website": "https://vertel.se/apps/odoo-dashboard/dashboard_vrtl_source_account",
     "license": "AGPL-3",
     "depends": ["dashboard_vrtl", "account"],
     "external_dependencies": {},
